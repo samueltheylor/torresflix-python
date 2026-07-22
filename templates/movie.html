@@ -1,0 +1,792 @@
+{% extends "base.html" %}
+
+{% block title %}{{ movie.title }} - TorresFlix{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        background-color: #141414;
+        color: white;
+        min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 68px;
+        background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 100%);
+        display: flex;
+        align-items: center;
+        padding: 0 60px;
+        z-index: 1000;
+    }
+
+    .logo {
+        font-size: 28px;
+        font-weight: bold;
+        color: #e50914;
+        cursor: pointer;
+        margin-right: 40px;
+        text-decoration: none;
+    }
+
+    .logo span {
+        color: white;
+    }
+
+    .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 25px;
+    }
+
+    .nav-links a {
+        color: #e5e5e5;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+        color: #b3b3b3;
+    }
+
+    .nav-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .icon-btn {
+        cursor: pointer;
+        font-size: 20px;
+        background: none;
+        border: none;
+        color: white;
+        transition: transform 0.2s;
+    }
+
+    .icon-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .profile-btn {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #e50914, #b20710);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        color: white;
+        transition: transform 0.2s;
+    }
+
+    .profile-btn:hover {
+        transform: scale(1.05);
+    }
+
+    /* Hero Section */
+    .movie-hero {
+        height: 85vh;
+        min-height: 600px;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        padding: 0 60px 80px;
+        background: linear-gradient(135deg, rgba(20,20,20,1) 0%, rgba(20,20,20,0.7) 40%, rgba(20,20,20,0.3) 100%),
+                    url('{{ movie.backdrop }}') center/cover no-repeat;
+    }
+
+    .movie-hero-content {
+        max-width: 650px;
+        z-index: 2;
+    }
+
+    .movie-title {
+        font-size: 56px;
+        font-weight: 800;
+        margin-bottom: 20px;
+        text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+        line-height: 1.1;
+    }
+
+    .movie-meta {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 25px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .movie-match {
+        color: #46d369;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .movie-year, .movie-duration {
+        color: #ddd;
+        font-size: 16px;
+    }
+
+    .movie-rating {
+        border: 1px solid #808080;
+        padding: 4px 10px;
+        font-size: 13px;
+        font-weight: bold;
+        border-radius: 3px;
+    }
+
+    .movie-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 14px 32px;
+        border: none;
+        border-radius: 6px;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .btn-play {
+        background: white;
+        color: #141414;
+    }
+
+    .btn-play:hover {
+        background: #f0f0f0;
+    }
+
+    .btn-list {
+        background: rgba(109, 109, 110, 0.8);
+        color: white;
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-list:hover {
+        background: rgba(109, 109, 110, 1);
+    }
+
+    .btn-list.added {
+        background: rgba(70, 211, 105, 0.8);
+    }
+
+    .btn-like {
+        background: rgba(109, 109, 110, 0.8);
+        color: white;
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-like:hover {
+        background: rgba(109, 109, 110, 1);
+    }
+
+    .hero-fade {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 300px;
+        background: linear-gradient(transparent, #141414);
+        z-index: 1;
+    }
+
+    /* Video Player Section */
+    .video-section {
+        background: #000;
+        padding: 30px 60px;
+        margin-bottom: 40px;
+    }
+
+    .video-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .video-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .video-title {
+        font-size: 26px;
+        font-weight: bold;
+    }
+
+    .video-close-btn {
+        background: #333;
+        border: none;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+
+    .video-close-btn:hover {
+        background: #555;
+    }
+
+    .video-player {
+        width: 100%;
+        max-height: 75vh;
+        border-radius: 10px;
+        background: #000;
+    }
+
+    /* Content Section */
+    .movie-content {
+        padding: 0 60px 60px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .movie-info {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 50px;
+        margin-bottom: 50px;
+    }
+
+    .movie-description {
+        font-size: 20px;
+        line-height: 1.7;
+        color: #e0e0e0;
+        margin-bottom: 35px;
+    }
+
+    .movie-details p {
+        margin-bottom: 12px;
+        font-size: 15px;
+    }
+
+    .movie-details .label {
+        color: #888;
+    }
+
+    .movie-details .value {
+        color: #e0e0e0;
+    }
+
+    .movie-cast {
+        margin-top: 25px;
+        font-size: 15px;
+    }
+
+    .movie-genres {
+        margin-top: 25px;
+    }
+
+    .genre-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, #333 0%, #2a2a2a 100%);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #444;
+        transition: all 0.3s;
+    }
+
+    .genre-tag:hover {
+        background: linear-gradient(135deg, #444 0%, #3a3a3a 100%);
+        border-color: #555;
+    }
+
+    /* Rating System */
+    .rating-section {
+        margin-top: 30px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        border: 1px solid #333;
+    }
+
+    .rating-stars {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .star {
+        background: none;
+        border: none;
+        font-size: 32px;
+        color: #444;
+        cursor: pointer;
+        transition: all 0.2s;
+        padding: 0;
+    }
+
+    .star:hover {
+        transform: scale(1.2);
+    }
+
+    .star.active {
+        color: #ffb700;
+        text-shadow: 0 0 10px rgba(255, 183, 0, 0.5);
+    }
+
+    .rating-text {
+        display: block;
+        margin-top: 10px;
+        color: #888;
+        font-size: 14px;
+    }
+
+    /* Similar Content */
+    .similar-section {
+        margin-top: 60px;
+    }
+
+    .similar-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    .similar-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .similar-card {
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #1f1f1f;
+    }
+
+    .similar-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+
+    .similar-card img {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+    }
+
+    .similar-card-info {
+        padding: 15px;
+    }
+
+    .similar-card-title {
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .similar-card-meta {
+        font-size: 13px;
+        color: #888;
+    }
+
+    /* Back Button */
+    .back-btn {
+        position: fixed;
+        top: 90px;
+        left: 60px;
+        background: rgba(0,0,0,0.6);
+        border: none;
+        color: white;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 1001;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+        background: rgba(0,0,0,0.9);
+        transform: scale(1.1);
+    }
+
+    /* Notification */
+    .notification {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: linear-gradient(135deg, #333 0%, #2a2a2a 100%);
+        color: white;
+        padding: 18px 35px;
+        border-radius: 10px;
+        z-index: 3000;
+        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        border: 1px solid #444;
+    }
+
+    .notification.show {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .notification-icon {
+        color: #46d369;
+        font-size: 18px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .navbar {
+            padding: 0 30px;
+        }
+
+        .movie-hero {
+            padding: 0 30px 60px;
+        }
+
+        .movie-title {
+            font-size: 42px;
+        }
+
+        .movie-content {
+            padding: 0 30px 40px;
+        }
+
+        .movie-info {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .back-btn {
+            left: 30px;
+        }
+
+        .video-section {
+            padding: 20px 30px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .navbar {
+            padding: 0 20px;
+        }
+
+        .nav-links {
+            display: none;
+        }
+
+        .movie-hero {
+            height: 70vh;
+            min-height: 500px;
+            padding: 0 20px 50px;
+        }
+
+        .movie-title {
+            font-size: 32px;
+        }
+
+        .movie-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .movie-content {
+            padding: 0 20px 30px;
+        }
+
+        .similar-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .back-btn {
+            left: 20px;
+            width: 42px;
+            height: 42px;
+            font-size: 20px;
+        }
+
+        .video-section {
+            padding: 15px 20px;
+        }
+
+        .video-header {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{{ url_for('home') }}" class="logo">TORRES<span>FLIX</span></a>
+    <ul class="nav-links">
+        <li><a href="{{ url_for('home') }}">Inicio</a></li>
+        <li><a href="#">Series</a></li>
+        <li><a href="#">Peliculas</a></li>
+        <li><a href="{{ url_for('my_list') }}">Mi lista</a></li>
+    </ul>
+    <div class="nav-right">
+        <button class="icon-btn" onclick="window.location.href='{{ url_for('search') }}'">🔍</button>
+        <button class="icon-btn">🔔</button>
+        <a href="{{ url_for('my_list') }}" class="icon-btn">📁</a>
+        <button class="profile-btn">{{ session.user_name[0] }}</button>
+    </div>
+</nav>
+
+<!-- Back Button -->
+<button class="back-btn" onclick="window.history.back()">←</button>
+
+<!-- Hero Section -->
+<section class="movie-hero">
+    <div class="movie-hero-content">
+        <h1 class="movie-title">{{ movie.title }}</h1>
+        <div class="movie-meta">
+            <span class="movie-match">{{ movie.match }}% coincidencia</span>
+            <span class="movie-year">{{ movie.year }}</span>
+            <span class="movie-duration">{{ movie.duration }}</span>
+            <span class="movie-rating">{{ movie.rating }}</span>
+        </div>
+        <div class="movie-buttons">
+            {% if movie.video %}
+            <button class="btn btn-play" onclick="playVideo()">▶ Reproducir</button>
+            {% else %}
+            <button class="btn btn-play" onclick="showNotification('Reproduciendo {{ movie.title }}...')">▶ Reproducir</button>
+            {% endif %}
+            <button class="btn btn-list" id="listBtn" onclick="toggleList({{ movie.id }})">+ Mi lista</button>
+            <button class="btn btn-like" onclick="showNotification('Me gusta!')">👍 Me gusta</button>
+        </div>
+    </div>
+    <div class="hero-fade"></div>
+</section>
+
+{% if movie.video %}
+<!-- Video Player Section -->
+<section id="videoPlayer" class="video-section" style="display: none;">
+    <div class="video-container">
+        <div class="video-header">
+            <h2 class="video-title">Reproduciendo: {{ movie.title }}</h2>
+            <button class="video-close-btn" onclick="closeVideo()">✕ Cerrar</button>
+        </div>
+        <video id="videoElement" class="video-player" controls>
+            <source src="{{ movie.video }}" type="video/mp4">
+            Tu navegador no soporta el reproductor de video.
+        </video>
+    </div>
+</section>
+{% endif %}
+
+<!-- Content -->
+<section class="movie-content">
+    <div class="movie-info">
+        <div class="movie-left">
+            <p class="movie-description">{{ movie.description }}</p>
+            
+            <div class="movie-cast">
+                <span class="label">Elenco: </span>
+                <span class="value">{{ movie.cast|join(', ') }}</span>
+            </div>
+            
+            <div class="movie-genres">
+                <span class="label">Generos: </span>
+                <div style="margin-top: 10px;">
+                    {% for genre in movie.genres %}
+                    <span class="genre-tag">{{ genre }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Rating System -->
+            <div class="rating-section">
+                <span class="label">Tu calificación: </span>
+                <div class="rating-stars" id="ratingStars">
+                    <button class="star" onclick="rateMovie({{ movie.id }}, 1)">★</button>
+                    <button class="star" onclick="rateMovie({{ movie.id }}, 2)">★</button>
+                    <button class="star" onclick="rateMovie({{ movie.id }}, 3)">★</button>
+                    <button class="star" onclick="rateMovie({{ movie.id }}, 4)">★</button>
+                    <button class="star" onclick="rateMovie({{ movie.id }}, 5)">★</button>
+                </div>
+                <span class="rating-text" id="ratingText">Califica esta película</span>
+            </div>
+        </div>
+        
+        <div class="movie-right">
+            <div class="movie-details">
+                <p><span class="label">Etiquetas: </span><span class="value">{{ movie.tags|join(', ') }}</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Similar Content -->
+    {% if similar %}
+    <div class="similar-section">
+        <h2 class="similar-title">Contenido similar</h2>
+        <div class="similar-grid">
+            {% for item in similar %}
+            <div class="similar-card" onclick="window.location.href='{{ url_for('movie_detail', movie_id=item.id) }}'">
+                <img src="{{ item.image }}" alt="{{ item.title }}">
+                <div class="similar-card-info">
+                    <div class="similar-card-title">{{ item.title }}</div>
+                    <div class="similar-card-meta">{{ item.match }}% coincidencia</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Notification -->
+<div class="notification" id="notification">
+    <span class="notification-icon">✓</span>
+    <span id="notificationText"></span>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function playVideo() {
+        const videoSection = document.getElementById('videoPlayer');
+        const videoElement = document.getElementById('videoElement');
+        if (videoSection && videoElement) {
+            videoSection.style.display = 'block';
+            videoSection.scrollIntoView({ behavior: 'smooth' });
+            videoElement.play();
+        }
+    }
+
+    function closeVideo() {
+        const videoSection = document.getElementById('videoPlayer');
+        const videoElement = document.getElementById('videoElement');
+        if (videoElement) {
+            videoElement.pause();
+            videoElement.currentTime = 0;
+        }
+        if (videoSection) {
+            videoSection.style.display = 'none';
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Handle keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        const videoElement = document.getElementById('videoElement');
+        if (videoElement && !videoElement.paused) {
+            switch(e.key) {
+                case ' ':
+                case 'k':
+                    e.preventDefault();
+                    videoElement.paused ? videoElement.play() : videoElement.pause();
+                    break;
+                case 'f':
+                    if (videoElement.requestFullscreen) {
+                        videoElement.requestFullscreen();
+                    }
+                    break;
+                case 'm':
+                    videoElement.muted = !videoElement.muted;
+                    break;
+                case 'Escape':
+                    closeVideo();
+                    break;
+            }
+        }
+    });
+
+    // Rating System
+    function rateMovie(movieId, rating) {
+        fetch('/api/rate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ movie_id: movieId, rating: rating })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateStars(rating);
+                showNotification(`Calificaste esta película con ${rating} estrella${rating > 1 ? 's' : ''}`);
+            }
+        });
+    }
+
+    function updateStars(rating) {
+        const stars = document.querySelectorAll('.star');
+        const ratingText = document.getElementById('ratingText');
+        
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+        
+        const messages = [
+            'Califica esta película',
+            'Malo',
+            'Regular',
+            'Bueno',
+            'Muy bueno',
+            '¡Excelente!'
+        ];
+        ratingText.textContent = messages[rating];
+    }
+
+    // Load user rating on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/get-ratings')
+            .then(response => response.json())
+            .then(ratings => {
+                const movieId = '{{ movie.id }}';
+                if (ratings[movieId]) {
+                    updateStars(ratings[movieId]);
+                }
+            });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,598 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar - TorresFlix{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        background-color: #141414;
+        color: white;
+    }
+
+    /* Navbar */
+    .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 68px;
+        background: #141414;
+        display: flex;
+        align-items: center;
+        padding: 0 60px;
+        z-index: 1000;
+        border-bottom: 1px solid #222;
+    }
+
+    .logo {
+        font-size: 28px;
+        font-weight: bold;
+        color: #e50914;
+        cursor: pointer;
+        margin-right: 40px;
+        text-decoration: none;
+    }
+
+    .logo span {
+        color: white;
+    }
+
+    .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 25px;
+    }
+
+    .nav-links a {
+        color: #e5e5e5;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s;
+        font-weight: 500;
+    }
+
+    .nav-links a:hover {
+        color: #b3b3b3;
+    }
+
+    .nav-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .icon-btn {
+        cursor: pointer;
+        font-size: 20px;
+        background: none;
+        border: none;
+        color: white;
+        transition: transform 0.2s;
+    }
+
+    .icon-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .profile-btn {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #e50914, #b20710);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        color: white;
+    }
+
+    /* Search Section */
+    .search-section {
+        padding: 100px 60px 40px;
+    }
+
+    .search-header {
+        margin-bottom: 40px;
+    }
+
+    .search-title {
+        font-size: 36px;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+
+    /* Search Box */
+    .search-box {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .search-input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 18px 24px 18px 50px;
+        background: #222;
+        border: 2px solid #333;
+        border-radius: 8px;
+        color: white;
+        font-size: 18px;
+        transition: all 0.3s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #e50914;
+        background: #2a2a2a;
+    }
+
+    .search-input::placeholder {
+        color: #666;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        color: #666;
+    }
+
+    .search-btn {
+        padding: 18px 40px;
+        background: #e50914;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .search-btn:hover {
+        background: #f40612;
+        transform: translateY(-2px);
+    }
+
+    /* Filters */
+    .filters {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter-label {
+        font-size: 13px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .filter-select {
+        padding: 12px 20px;
+        background: #222;
+        border: 1px solid #333;
+        border-radius: 6px;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        min-width: 150px;
+        transition: all 0.3s;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #e50914;
+    }
+
+    .filter-select option {
+        background: #222;
+        color: white;
+    }
+
+    /* Results */
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .results-count {
+        color: #888;
+        font-size: 16px;
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 25px;
+    }
+
+    .result-card {
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #1a1a1a;
+        border: 1px solid #222;
+    }
+
+    .result-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        border-color: #444;
+    }
+
+    .result-card img {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+    }
+
+    .result-card-info {
+        padding: 18px;
+    }
+
+    .result-card-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .result-card-meta {
+        display: flex;
+        gap: 10px;
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 10px;
+    }
+
+    .result-card-genres {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .genre-tag {
+        background: #333;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+    }
+
+    .result-card-rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 10px;
+        color: #ffb700;
+        font-size: 13px;
+    }
+
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 80px 0;
+        color: #666;
+    }
+
+    .no-results-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .no-results-title {
+        font-size: 24px;
+        color: white;
+        margin-bottom: 10px;
+    }
+
+    .no-results-text {
+        font-size: 16px;
+    }
+
+    /* Notification */
+    .notification {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: linear-gradient(135deg, #333 0%, #2a2a2a 100%);
+        color: white;
+        padding: 18px 35px;
+        border-radius: 10px;
+        z-index: 3000;
+        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        border: 1px solid #444;
+    }
+
+    .notification.show {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .notification-icon {
+        color: #46d369;
+        font-size: 18px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .navbar {
+            padding: 0 20px;
+        }
+
+        .nav-links {
+            display: none;
+        }
+
+        .search-section {
+            padding: 100px 20px 40px;
+        }
+
+        .search-box {
+            flex-direction: column;
+        }
+
+        .search-btn {
+            width: 100%;
+        }
+
+        .filters {
+            flex-direction: column;
+        }
+
+        .filter-select {
+            width: 100%;
+        }
+
+        .results-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{{ url_for('home') }}" class="logo">TORRES<span>FLIX</span></a>
+    <ul class="nav-links">
+        <li><a href="{{ url_for('home') }}">Inicio</a></li>
+        <li><a href="#">Series</a></li>
+        <li><a href="#">Peliculas</a></li>
+        <li><a href="{{ url_for('my_list') }}">Mi lista</a></li>
+    </ul>
+    <div class="nav-right">
+        <button class="icon-btn" onclick="window.location.href='{{ url_for('search') }}'">🔍</button>
+        <button class="icon-btn">🔔</button>
+        <a href="{{ url_for('my_list') }}" class="icon-btn">📁</a>
+        <button class="profile-btn">{{ session.user_name[0] }}</button>
+    </div>
+</nav>
+
+<!-- Search Section -->
+<section class="search-section">
+    <div class="search-header">
+        <h1 class="search-title">Buscar contenido</h1>
+        
+        <!-- Search Box -->
+        <div class="search-box">
+            <div class="search-input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="Buscar por título, actor, género..." value="{{ query }}">
+            </div>
+            <button class="search-btn" onclick="performSearch()">Buscar</button>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label">Género</span>
+                <select class="filter-select" id="genreFilter" onchange="performSearch()">
+                    <option value="">Todos</option>
+                    <option value="accion">Acción</option>
+                    <option value="aventura">Aventura</option>
+                    <option value="comedia">Comedia</option>
+                    <option value="drama">Drama</option>
+                    <option value="terror">Terror</option>
+                    <option value="ciencia ficcion">Ciencia Ficción</option>
+                    <option value="animacion">Animación</option>
+                    <option value="documental">Documental</option>
+                    <option value="romance">Romance</option>
+                    <option value="suspensos">Suspense</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <span class="filter-label">Año</span>
+                <select class="filter-select" id="yearFilter" onchange="performSearch()">
+                    <option value="">Todos</option>
+                    <option value="2026">2026</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <span class="filter-label">Calificación mínima</span>
+                <select class="filter-select" id="ratingFilter" onchange="performSearch()">
+                    <option value="0">Cualquiera</option>
+                    <option value="3">⭐ 3+</option>
+                    <option value="4">⭐ 4+</option>
+                    <option value="5">⭐ 5</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results -->
+    <div class="results-header">
+        <p class="results-count" id="resultsCount">{{ results|length }} resultados encontrados</p>
+    </div>
+    
+    <div class="results-grid" id="resultsGrid">
+        {% for movie in results %}
+        <div class="result-card" onclick="window.location.href='{{ url_for('movie_detail', movie_id=movie.id) }}'">
+            <img src="{{ movie.image }}" alt="{{ movie.title }}">
+            <div class="result-card-info">
+                <div class="result-card-title">{{ movie.title }}</div>
+                <div class="result-card-meta">
+                    <span>{{ movie.year }}</span>
+                    <span>•</span>
+                    <span>{{ movie.duration }}</span>
+                </div>
+                <div class="result-card-genres">
+                    {% for genre in movie.genres %}
+                    <span class="genre-tag">{{ genre }}</span>
+                    {% endfor %}
+                </div>
+                {% if movie.rating %}
+                <div class="result-card-rating">
+                    ⭐ {{ movie.rating }}/5
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- No Results -->
+    {% if not results and query %}
+    <div class="no-results">
+        <div class="no-results-icon">🔍</div>
+        <h2 class="no-results-title">No se encontraron resultados</h2>
+        <p class="no-results-text">Intenta con otros términos de búsqueda</p>
+    </div>
+    {% endif %}
+    
+    {% if not results and not query %}
+    <div class="no-results">
+        <div class="no-results-icon">🎬</div>
+        <h2 class="no-results-title">Busca tu contenido favorito</h2>
+        <p class="no-results-text">Encuentra películas, series y más</p>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Notification -->
+<div class="notification" id="notification">
+    <span class="notification-icon">✓</span>
+    <span id="notificationText"></span>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Search on Enter key
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+
+    // Live search with debounce
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            performSearch();
+        }, 300);
+    });
+
+    function performSearch() {
+        const query = document.getElementById('searchInput').value;
+        const genre = document.getElementById('genreFilter').value;
+        const year = document.getElementById('yearFilter').value;
+        const minRating = document.getElementById('ratingFilter').value;
+        
+        // Build URL with params
+        const params = new URLSearchParams();
+        if (query) params.append('q', query);
+        if (genre) params.append('genre', genre);
+        if (year) params.append('year', year);
+        if (minRating > 0) params.append('min_rating', minRating);
+        
+        // Fetch results
+        fetch('/api/search?' + params.toString())
+            .then(response => response.json())
+            .then(results => {
+                updateResults(results);
+            });
+    }
+
+    function updateResults(results) {
+        const grid = document.getElementById('resultsGrid');
+        const count = document.getElementById('resultsCount');
+        
+        count.textContent = results.length + ' resultados encontrados';
+        
+        if (results.length === 0) {
+            grid.innerHTML = `
+                <div class="no-results" style="grid-column: 1/-1;">
+                    <div class="no-results-icon">🔍</div>
+                    <h2 class="no-results-title">No se encontraron resultados</h2>
+                    <p class="no-results-text">Intenta con otros términos de búsqueda</p>
+                </div>
+            `;
+            return;
+        }
+        
+        grid.innerHTML = results.map(movie => `
+            <div class="result-card" onclick="window.location.href='/movie/${movie.id}'">
+                <img src="${movie.image}" alt="${movie.title}">
+                <div class="result-card-info">
+                    <div class="result-card-title">${movie.title}</div>
+                    <div class="result-card-meta">
+                        <span>${movie.year}</span>
+                        <span>•</span>
+                        <span>${movie.duration}</span>
+                    </div>
+                    <div class="result-card-genres">
+                        ${movie.genres.map(g => `<span class="genre-tag">${g}</span>`).join('')}
+                    </div>
+                    ${movie.rating ? `<div class="result-card-rating">⭐ ${movie.rating}/5</div>` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function showNotification(text) {
+        const notification = document.getElementById('notification');
+        document.getElementById('notificationText').textContent = text;
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+</script>
+{% endblock %}

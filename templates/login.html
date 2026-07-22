@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar Sesion - TorresFlix{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #141414;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .login-container {
+        background: rgba(0,0,0,0.75);
+        padding: 60px 68px 40px;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .login-logo {
+        font-size: 32px;
+        font-weight: bold;
+        color: #e50914;
+        margin-bottom: 30px;
+    }
+
+    .login-logo span {
+        color: white;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 16px 20px;
+        background: #333;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus {
+        outline: 2px solid #e50914;
+    }
+
+    .form-group input::placeholder {
+        color: #8c8c8c;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 16px;
+        background: #e50914;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background 0.3s;
+    }
+
+    .login-btn:hover {
+        background: #f40612;
+    }
+
+    .error-message {
+        background: #e87c03;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .help-links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+        font-size: 13px;
+    }
+
+    .help-links a {
+        color: #b3b3b3;
+        text-decoration: none;
+    }
+
+    .help-links a:hover {
+        text-decoration: underline;
+    }
+
+    .signup-link {
+        margin-top: 60px;
+        color: #737373;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .signup-link a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .demo-credentials {
+        margin-top: 30px;
+        padding: 15px;
+        background: rgba(229, 9, 20, 0.1);
+        border: 1px solid rgba(229, 9, 20, 0.3);
+        border-radius: 4px;
+        font-size: 13px;
+        color: #b3b3b3;
+    }
+
+    .demo-credentials strong {
+        color: #e50914;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="login-container">
+    <div class="login-logo">TORRES<span>FLIX</span></div>
+    
+    {% if error %}
+    <div class="error-message">{{ error }}</div>
+    {% endif %}
+    
+    <form method="POST">
+        <div class="form-group">
+            <input type="text" name="username" placeholder="Usuario" required>
+        </div>
+        <div class="form-group">
+            <input type="password" name="password" placeholder="Contrasena" required>
+        </div>
+        <button type="submit" class="login-btn">Iniciar Sesion</button>
+    </form>
+    
+    <div class="help-links">
+        <a href="#">¿Necesitas ayuda?</a>
+    </div>
+    
+    <div class="signup-link">
+        ¿Quieres unirte a TorresFlix? <a href="#">Registrate ahora</a>
+    </div>
+    
+    <div class="demo-credentials">
+        <strong>Credenciales de prueba:</strong><br>
+        Usuario: <strong>admin</strong> | Contrasena: <strong>admin123</strong><br>
+        Usuario: <strong>user</strong> | Contrasena: <strong>user123</strong>
+    </div>
+</div>
+{% endblock %}
