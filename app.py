@@ -414,26 +414,46 @@ def movie_detail(movie_id):
     if not movie:
         return redirect(url_for('home'))
     
-    # Obtener peliculas similares
     similar = [m for m in MOVIES_DB.values() 
                if m['category'] == movie['category'] and m['id'] != movie['id']][:4]
     
-    return render_template('movie.html', movie=movie, similar=similar)
+    in_list = movie_id in session.get('my_list', [])
+    liked = movie_id in session.get('likes', [])
+    
+    return render_template('movie.html', movie=movie, similar=similar, in_list=in_list, liked=liked)
+
+@app.route('/browse')
+@login_required
+def browse():
+    category = request.args.get('category', 'trending')
+    category_names = {
+        'trending': 'Tendencias',
+        'action': 'Accion y aventura',
+        'comedies': 'Comedias',
+        'documentaries': 'Documentales'
+    }
+    movies = [m for m in MOVIES_DB.values() if m['category'] == category]
+    name = category_names.get(category, category.title())
+    return render_template('browse.html', movies=movies, category=category, category_name=name)
 
 @app.route('/search')
 @login_required
 def search():
     query = request.args.get('q', '').lower()
     results = []
-    
+    all_years = sorted(set(m['year'] for m in MOVIES_DB.values()), reverse=True)
+    all_genres = sorted(set(g for m in MOVIES_DB.values() for g in m['genres']))
+
     if query:
         for movie in MOVIES_DB.values():
             if (query in movie['title'].lower() or 
                 query in ' '.join(movie['genres']).lower() or
                 query in ' '.join(movie['cast']).lower()):
                 results.append(movie)
-    
-    return render_template('search.html', query=query, results=results)
+    else:
+        results = sorted(MOVIES_DB.values(), key=lambda m: m['match'], reverse=True)[:12]
+
+    return render_template('search.html', query=query, results=results, all_years=all_years, all_genres=all_genres)
 
 @app.route('/my-list')
 @login_required
@@ -459,18 +479,40 @@ def toggle_list():
     session.modified = True
     return jsonify({'added': added})
 
+@app.route('/api/toggle-like', methods=['POST'])
+@login_required
+def toggle_like():
+    movie_id = request.json.get('movie_id')
+    if 'likes' not in session:
+        session['likes'] = []
+    
+    if movie_id in session['likes']:
+        session['likes'].remove(movie_id)
+        liked = False
+    else:
+        session['likes'].append(movie_id)
+        liked = True
+    
+    session.modified = True
+    return jsonify({'liked': liked})
+
+@app.route('/api/get-likes')
+@login_required
+def get_likes():
+    return jsonify(session.get('likes', []))
+
 @app.route('/api/search')
 @login_required
 def api_search():
     query = request.args.get('q', '').lower()
     genre = request.args.get('genre', '').lower()
     year = request.args.get('year', '')
+    category = request.args.get('category', '')
     min_rating = request.args.get('min_rating', 0, type=int)
     
     results = []
     
     for movie in MOVIES_DB.values():
-        # Text search
         if query:
             if not (query in movie['title'].lower() or 
                    query in ' '.join(movie['genres']).lower() or
@@ -478,15 +520,15 @@ def api_search():
                    query in movie.get('description', '').lower()):
                 continue
         
-        # Genre filter
         if genre and not any(genre in g.lower() for g in movie['genres']):
             continue
         
-        # Year filter
         if year and str(movie['year']) != year:
             continue
+
+        if category and movie['category'] != category:
+            continue
         
-        # Rating filter
         movie_rating = movie.get('user_rating', 0)
         if min_rating and movie_rating < min_rating:
             continue

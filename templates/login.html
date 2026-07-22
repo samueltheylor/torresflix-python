@@ -5,13 +5,10 @@
 {% block extra_css %}
 <style>
     body {
-        background: #141414;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        margin: 0;
-        font-family: 'Helvetica Neue', Arial, sans-serif;
     }
 
     .login-container {
@@ -29,13 +26,9 @@
         margin-bottom: 30px;
     }
 
-    .login-logo span {
-        color: white;
-    }
+    .login-logo span { color: white; }
 
-    .form-group {
-        margin-bottom: 16px;
-    }
+    .form-group { margin-bottom: 16px; }
 
     .form-group input {
         width: 100%;
@@ -48,13 +41,8 @@
         box-sizing: border-box;
     }
 
-    .form-group input:focus {
-        outline: 2px solid #e50914;
-    }
-
-    .form-group input::placeholder {
-        color: #8c8c8c;
-    }
+    .form-group input:focus { outline: 2px solid #e50914; }
+    .form-group input::placeholder { color: #8c8c8c; }
 
     .login-btn {
         width: 100%;
@@ -70,9 +58,7 @@
         transition: background 0.3s;
     }
 
-    .login-btn:hover {
-        background: #f40612;
-    }
+    .login-btn:hover { background: #f40612; }
 
     .error-message {
         background: #e87c03;
@@ -90,14 +76,8 @@
         font-size: 13px;
     }
 
-    .help-links a {
-        color: #b3b3b3;
-        text-decoration: none;
-    }
-
-    .help-links a:hover {
-        text-decoration: underline;
-    }
+    .help-links a { color: #b3b3b3; text-decoration: none; }
+    .help-links a:hover { text-decoration: underline; }
 
     .signup-link {
         margin-top: 60px;
@@ -106,10 +86,7 @@
         text-align: center;
     }
 
-    .signup-link a {
-        color: white;
-        text-decoration: none;
-    }
+    .signup-link a { color: white; text-decoration: none; }
 
     .demo-credentials {
         margin-top: 30px;
@@ -121,11 +98,12 @@
         color: #b3b3b3;
     }
 
-    .demo-credentials strong {
-        color: #e50914;
-    }
+    .demo-credentials strong { color: #e50914; }
 </style>
 {% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
 
 {% block body %}
 <div class="login-container">

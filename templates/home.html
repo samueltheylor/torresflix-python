@@ -4,189 +4,6 @@
 
 {% block extra_css %}
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Helvetica Neue', Arial, sans-serif;
-        background-color: #141414;
-        color: white;
-        overflow-x: hidden;
-    }
-
-    /* Navbar */
-    .navbar {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        height: 68px;
-        background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
-        display: flex;
-        align-items: center;
-        padding: 0 60px;
-        z-index: 1000;
-        transition: background 0.3s;
-    }
-
-    .navbar.scrolled {
-        background: #141414;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-
-    .logo {
-        font-size: 28px;
-        font-weight: bold;
-        color: #e50914;
-        cursor: pointer;
-        margin-right: 40px;
-        text-decoration: none;
-        letter-spacing: 1px;
-    }
-
-    .logo span {
-        color: white;
-    }
-
-    .nav-links {
-        display: flex;
-        list-style: none;
-        gap: 25px;
-    }
-
-    .nav-links a {
-        color: #e5e5e5;
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 0.3s;
-        font-weight: 500;
-    }
-
-    .nav-links a:hover {
-        color: #b3b3b3;
-    }
-
-    .nav-right {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        gap: 25px;
-    }
-
-    .search-container {
-        position: relative;
-    }
-
-    .search-box {
-        display: flex;
-        align-items: center;
-        background: rgba(0,0,0,0.8);
-        border: 1px solid #555;
-        border-radius: 6px;
-        padding: 10px 14px;
-        opacity: 0;
-        width: 0;
-        transition: all 0.3s;
-    }
-
-    .search-box.active {
-        opacity: 1;
-        width: 280px;
-    }
-
-    .search-box input {
-        background: transparent;
-        border: none;
-        color: white;
-        outline: none;
-        font-size: 14px;
-        width: 100%;
-    }
-
-    .search-box input::placeholder {
-        color: #888;
-    }
-
-    .search-results {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        width: 320px;
-        background: #1a1a1a;
-        border-radius: 8px;
-        max-height: 400px;
-        overflow-y: auto;
-        display: none;
-        z-index: 1001;
-        margin-top: 8px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        border: 1px solid #333;
-    }
-
-    .search-results.active {
-        display: block;
-    }
-
-    .search-result-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        gap: 12px;
-        cursor: pointer;
-        transition: background 0.3s;
-        border-bottom: 1px solid #222;
-    }
-
-    .search-result-item:last-child {
-        border-bottom: none;
-    }
-
-    .search-result-item:hover {
-        background: #2a2a2a;
-    }
-
-    .search-result-item img {
-        width: 60px;
-        height: 36px;
-        object-fit: cover;
-        border-radius: 4px;
-    }
-
-    .icon-btn {
-        cursor: pointer;
-        font-size: 20px;
-        background: none;
-        border: none;
-        color: white;
-        transition: transform 0.2s;
-    }
-
-    .icon-btn:hover {
-        transform: scale(1.1);
-    }
-
-    .profile-btn {
-        width: 36px;
-        height: 36px;
-        background: linear-gradient(135deg, #e50914, #b20710);
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 15px;
-        font-weight: bold;
-        cursor: pointer;
-        border: none;
-        color: white;
-        transition: transform 0.2s;
-    }
-
-    .profile-btn:hover {
-        transform: scale(1.05);
-    }
-
     /* Hero Section */
     .hero {
         height: 85vh;
@@ -235,44 +52,6 @@
     .hero-buttons {
         display: flex;
         gap: 15px;
-    }
-
-    .btn {
-        padding: 14px 32px;
-        border: none;
-        border-radius: 6px;
-        font-size: 17px;
-        font-weight: bold;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: all 0.3s;
-        text-decoration: none;
-    }
-
-    .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-    }
-
-    .btn-play {
-        background: white;
-        color: #141414;
-    }
-
-    .btn-play:hover {
-        background: #f0f0f0;
-    }
-
-    .btn-info {
-        background: rgba(109, 109, 110, 0.8);
-        color: white;
-        backdrop-filter: blur(10px);
-    }
-
-    .btn-info:hover {
-        background: rgba(109, 109, 110, 1);
     }
 
     .hero-fade {
@@ -425,169 +204,30 @@
         gap: 8px;
     }
 
-    .card-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        border: 2px solid rgba(255,255,255,0.5);
-        background: rgba(42, 42, 42, 0.9);
-        color: white;
-        font-size: 13px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s;
-    }
-
-    .card-btn:hover {
-        border-color: white;
-        background: rgba(70, 70, 70, 1);
-        transform: scale(1.1);
-    }
-
-    .card-btn.play {
-        background: white;
-        color: #141414;
-        border-color: white;
-    }
-
-    .card-btn.play:hover {
-        background: #f0f0f0;
-    }
-
-    .card-btn.added {
-        border-color: #46d369;
-        color: #46d369;
-    }
-
-    /* Notification */
-    .notification {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%) translateY(100px);
-        background: linear-gradient(135deg, #333 0%, #2a2a2a 100%);
-        color: white;
-        padding: 18px 35px;
-        border-radius: 10px;
-        z-index: 3000;
-        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        border: 1px solid #444;
-    }
-
-    .notification.show {
-        transform: translateX(-50%) translateY(0);
-    }
-
-    .notification-icon {
-        color: #46d369;
-        font-size: 18px;
-    }
-
-    /* Responsive */
     @media (max-width: 1024px) {
-        .navbar {
-            padding: 0 30px;
-        }
-
-        .hero {
-            padding: 0 30px 80px;
-        }
-
-        .hero-title {
-            font-size: 44px;
-        }
-
-        .content-section {
-            padding: 20px 30px 40px;
-        }
-
-        .card {
-            min-width: 200px;
-        }
+        .hero { padding: 0 30px 80px; }
+        .hero-title { font-size: 44px; }
+        .content-section { padding: 20px 30px 40px; }
+        .card { min-width: 200px; }
     }
 
     @media (max-width: 768px) {
-        .navbar {
-            padding: 0 20px;
-        }
-
-        .nav-links {
-            display: none;
-        }
-
-        .hero {
-            height: 70vh;
-            min-height: 500px;
-            padding: 0 20px 60px;
-        }
-
-        .hero-title {
-            font-size: 34px;
-        }
-
-        .hero-description {
-            font-size: 16px;
-        }
-
-        .hero-buttons {
-            flex-direction: column;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .content-section {
-            padding: 20px 15px 30px;
-        }
-
-        .card {
-            min-width: 160px;
-        }
-
-        .card img {
-            height: 100px;
-        }
-
-        .slider-btn {
-            padding: 40px 10px;
-            font-size: 26px;
-        }
+        .hero { height: 70vh; min-height: 500px; padding: 0 20px 60px; }
+        .hero-title { font-size: 34px; }
+        .hero-description { font-size: 16px; }
+        .hero-buttons { flex-direction: column; }
+        .btn { width: 100%; justify-content: center; }
+        .content-section { padding: 20px 15px 30px; }
+        .card { min-width: 160px; }
+        .card img { height: 100px; }
+        .slider-btn { padding: 40px 10px; font-size: 26px; }
     }
 </style>
 {% endblock %}
 
-{% block body %}
-<!-- Navbar -->
-<nav class="navbar" id="navbar">
-    <a href="{{ url_for('home') }}" class="logo">TORRES<span>FLIX</span></a>
-    <ul class="nav-links">
-        <li><a href="{{ url_for('home') }}">Inicio</a></li>
-        <li><a href="#">Series</a></li>
-        <li><a href="#">Peliculas</a></li>
-        <li><a href="{{ url_for('my_list') }}">Mi lista</a></li>
-    </ul>
-    <div class="nav-right">
-        <div class="search-container">
-            <div class="search-box" id="searchBox">
-                <input type="text" placeholder="Buscar peliculas, series..." id="searchInput">
-            </div>
-            <div class="search-results" id="searchResults"></div>
-        </div>
-        <button class="icon-btn" onclick="toggleSearch()">🔍</button>
-        <button class="icon-btn">🔔</button>
-        <a href="{{ url_for('my_list') }}" class="icon-btn">📁</a>
-        <button class="profile-btn" onclick="window.location.href='{{ url_for('profiles') }}'">{{ session.user_name[0] }}</button>
-    </div>
-</nav>
+{% block navbar_class %}{% endblock %}
 
+{% block body %}
 <!-- Hero Section -->
 <section class="hero">
     <div class="hero-content">
@@ -595,7 +235,11 @@
         <h1 class="hero-title">{{ featured.title }}</h1>
         <p class="hero-description">{{ featured.description }}</p>
         <div class="hero-buttons">
-            <a href="#" class="btn btn-play" onclick="showNotification('Reproduciendo...')">▶ Reproducir</a>
+            {% if featured.video %}
+            <a href="{{ url_for('movie_detail', movie_id=featured.id) }}" class="btn btn-play">▶ Reproducir</a>
+            {% else %}
+            <a href="{{ url_for('movie_detail', movie_id=featured.id) }}" class="btn btn-play">▶ Reproducir</a>
+            {% endif %}
             <a href="{{ url_for('movie_detail', movie_id=featured.id) }}" class="btn btn-info">ℹ Mas informacion</a>
         </div>
     </div>
@@ -608,7 +252,7 @@
     <div class="content-row">
         <div class="row-header">
             <h2 class="row-title">Tendencias ahora</h2>
-            <a href="#" class="row-see-all">Ver todo ›</a>
+            <a href="{{ url_for('browse', category='trending') }}" class="row-see-all">Ver todo ›</a>
         </div>
         <div style="position: relative;">
             <button class="slider-btn slider-btn-left" onclick="slide(this, -1)">‹</button>
@@ -618,9 +262,9 @@
                     <img src="{{ movie.image }}" alt="{{ movie.title }}">
                     <div class="card-overlay">
                         <div class="card-actions">
-                            <button class="card-btn play" onclick="event.stopPropagation(); showNotification('Reproduciendo {{ movie.title }}')">▶</button>
+                            <button class="card-btn play" onclick="event.stopPropagation(); window.location.href='{{ url_for('movie_detail', movie_id=movie.id) }}'">▶</button>
                             <button class="card-btn" id="listBtn{{ movie.id }}" onclick="event.stopPropagation(); toggleList({{ movie.id }})">+</button>
-                            <button class="card-btn" onclick="event.stopPropagation(); showNotification('Me gusta!')">👍</button>
+                            <button class="card-btn" id="likeBtn{{ movie.id }}" onclick="event.stopPropagation(); toggleLike({{ movie.id }})">👍</button>
                         </div>
                         <div class="card-title">{{ movie.title }}</div>
                         <div class="card-meta">{{ movie.match }}% coincidencia</div>
@@ -636,7 +280,7 @@
     <div class="content-row">
         <div class="row-header">
             <h2 class="row-title">Accion y aventura</h2>
-            <a href="#" class="row-see-all">Ver todo ›</a>
+            <a href="{{ url_for('browse', category='action') }}" class="row-see-all">Ver todo ›</a>
         </div>
         <div style="position: relative;">
             <button class="slider-btn slider-btn-left" onclick="slide(this, -1)">‹</button>
@@ -646,9 +290,9 @@
                     <img src="{{ movie.image }}" alt="{{ movie.title }}">
                     <div class="card-overlay">
                         <div class="card-actions">
-                            <button class="card-btn play" onclick="event.stopPropagation(); showNotification('Reproduciendo {{ movie.title }}')">▶</button>
-                            <button class="card-btn" onclick="event.stopPropagation(); toggleList({{ movie.id }})">+</button>
-                            <button class="card-btn" onclick="event.stopPropagation(); showNotification('Me gusta!')">👍</button>
+                            <button class="card-btn play" onclick="event.stopPropagation(); window.location.href='{{ url_for('movie_detail', movie_id=movie.id) }}'">▶</button>
+                            <button class="card-btn" id="listBtn{{ movie.id }}" onclick="event.stopPropagation(); toggleList({{ movie.id }})">+</button>
+                            <button class="card-btn" id="likeBtn{{ movie.id }}" onclick="event.stopPropagation(); toggleLike({{ movie.id }})">👍</button>
                         </div>
                         <div class="card-title">{{ movie.title }}</div>
                         <div class="card-meta">{{ movie.match }}% coincidencia</div>
@@ -664,7 +308,7 @@
     <div class="content-row">
         <div class="row-header">
             <h2 class="row-title">Comedias</h2>
-            <a href="#" class="row-see-all">Ver todo ›</a>
+            <a href="{{ url_for('browse', category='comedies') }}" class="row-see-all">Ver todo ›</a>
         </div>
         <div style="position: relative;">
             <button class="slider-btn slider-btn-left" onclick="slide(this, -1)">‹</button>
@@ -674,9 +318,9 @@
                     <img src="{{ movie.image }}" alt="{{ movie.title }}">
                     <div class="card-overlay">
                         <div class="card-actions">
-                            <button class="card-btn play" onclick="event.stopPropagation(); showNotification('Reproduciendo {{ movie.title }}')">▶</button>
-                            <button class="card-btn" onclick="event.stopPropagation(); toggleList({{ movie.id }})">+</button>
-                            <button class="card-btn" onclick="event.stopPropagation(); showNotification('Me gusta!')">👍</button>
+                            <button class="card-btn play" onclick="event.stopPropagation(); window.location.href='{{ url_for('movie_detail', movie_id=movie.id) }}'">▶</button>
+                            <button class="card-btn" id="listBtn{{ movie.id }}" onclick="event.stopPropagation(); toggleList({{ movie.id }})">+</button>
+                            <button class="card-btn" id="likeBtn{{ movie.id }}" onclick="event.stopPropagation(); toggleLike({{ movie.id }})">👍</button>
                         </div>
                         <div class="card-title">{{ movie.title }}</div>
                         <div class="card-meta">{{ movie.match }}% coincidencia</div>
@@ -692,7 +336,7 @@
     <div class="content-row">
         <div class="row-header">
             <h2 class="row-title">Documentales</h2>
-            <a href="#" class="row-see-all">Ver todo ›</a>
+            <a href="{{ url_for('browse', category='documentaries') }}" class="row-see-all">Ver todo ›</a>
         </div>
         <div style="position: relative;">
             <button class="slider-btn slider-btn-left" onclick="slide(this, -1)">‹</button>
@@ -702,9 +346,9 @@
                     <img src="{{ movie.image }}" alt="{{ movie.title }}">
                     <div class="card-overlay">
                         <div class="card-actions">
-                            <button class="card-btn play" onclick="event.stopPropagation(); showNotification('Reproduciendo {{ movie.title }}')">▶</button>
-                            <button class="card-btn" onclick="event.stopPropagation(); toggleList({{ movie.id }})">+</button>
-                            <button class="card-btn" onclick="event.stopPropagation(); showNotification('Me gusta!')">👍</button>
+                            <button class="card-btn play" onclick="event.stopPropagation(); window.location.href='{{ url_for('movie_detail', movie_id=movie.id) }}'">▶</button>
+                            <button class="card-btn" id="listBtn{{ movie.id }}" onclick="event.stopPropagation(); toggleList({{ movie.id }})">+</button>
+                            <button class="card-btn" id="likeBtn{{ movie.id }}" onclick="event.stopPropagation(); toggleLike({{ movie.id }})">👍</button>
                         </div>
                         <div class="card-title">{{ movie.title }}</div>
                         <div class="card-meta">{{ movie.match }}% coincidencia</div>
@@ -716,22 +360,22 @@
         </div>
     </div>
 </section>
-
-<!-- Notification -->
-<div class="notification" id="notification">
-    <span class="notification-icon">✓</span>
-    <span id="notificationText"></span>
-</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    document.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-            document.getElementById('navbar').classList.add('scrolled');
-        } else {
-            document.getElementById('navbar').classList.remove('scrolled');
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    const likedMovies = [];
+    const myList = [];
+    
+    fetch('/api/get-likes').then(r => r.json()).then(likes => {
+        likes.forEach(id => {
+            const btn = document.getElementById('likeBtn' + id);
+            if (btn) { btn.classList.add('liked'); btn.innerHTML = '❤'; }
+        });
     });
+    
+    fetch('/api/get-ratings').then(r => r.json()).then(() => {});
+});
 </script>
 {% endblock %}

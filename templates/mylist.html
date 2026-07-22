@@ -2,112 +2,15 @@
 
 {% block title %}Mi Lista - TorresFlix{% endblock %}
 
+{% block navbar_class %}solid{% endblock %}
+
 {% block extra_css %}
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    .mylist-section { padding: 100px 60px 40px; }
 
-    body {
-        font-family: 'Helvetica Neue', Arial, sans-serif;
-        background-color: #141414;
-        color: white;
-    }
-
-    /* Navbar */
-    .navbar {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        height: 68px;
-        background: #141414;
-        display: flex;
-        align-items: center;
-        padding: 0 60px;
-        z-index: 1000;
-    }
-
-    .logo {
-        font-size: 28px;
-        font-weight: bold;
-        color: #e50914;
-        cursor: pointer;
-        margin-right: 40px;
-        text-decoration: none;
-    }
-
-    .logo span {
-        color: white;
-    }
-
-    .nav-links {
-        display: flex;
-        list-style: none;
-        gap: 20px;
-    }
-
-    .nav-links a {
-        color: #e5e5e5;
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 0.3s;
-    }
-
-    .nav-links a:hover {
-        color: #b3b3b3;
-    }
-
-    .nav-right {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .icon-btn {
-        cursor: pointer;
-        font-size: 20px;
-        background: none;
-        border: none;
-        color: white;
-    }
-
-    .profile-btn {
-        width: 32px;
-        height: 32px;
-        background: linear-gradient(135deg, #e50914, #b20710);
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        border: none;
-        color: white;
-    }
-
-    /* My List Section */
-    .mylist-section {
-        padding: 100px 60px 40px;
-    }
-
-    .mylist-header {
-        margin-bottom: 40px;
-    }
-
-    .mylist-title {
-        font-size: 32px;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-
-    .mylist-subtitle {
-        color: #808080;
-        font-size: 16px;
-    }
+    .mylist-header { margin-bottom: 40px; }
+    .mylist-title { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+    .mylist-subtitle { color: #808080; font-size: 16px; }
 
     .mylist-grid {
         display: grid;
@@ -123,94 +26,25 @@
         transition: transform 0.3s;
     }
 
-    .mylist-card:hover {
-        transform: scale(1.05);
-    }
-
-    .mylist-card img {
-        width: 100%;
-        height: 120px;
-        object-fit: cover;
-    }
+    .mylist-card:hover { transform: scale(1.05); }
+    .mylist-card img { width: 100%; height: 120px; object-fit: cover; }
 
     .mylist-card-overlay {
         position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        bottom: 0; left: 0; right: 0;
         background: linear-gradient(transparent, rgba(20,20,20,0.95));
         padding: 30px 10px 10px;
     }
 
-    .mylist-card-title {
-        font-size: 13px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
+    .mylist-card-title { font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+    .mylist-card-meta { font-size: 11px; color: #46d369; }
 
-    .mylist-card-meta {
-        font-size: 11px;
-        color: #46d369;
-    }
+    .mylist-card-actions { display: flex; gap: 6px; margin-top: 8px; }
 
-    .mylist-card-actions {
-        display: flex;
-        gap: 6px;
-        margin-top: 8px;
-    }
-
-    .card-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        border: 2px solid rgba(255,255,255,0.5);
-        background: rgba(42, 42, 42, 0.8);
-        color: white;
-        font-size: 12px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s;
-    }
-
-    .card-btn:hover {
-        border-color: white;
-        background: rgba(60, 60, 60, 0.9);
-    }
-
-    .card-btn.play {
-        background: white;
-        color: #141414;
-        border-color: white;
-    }
-
-    .card-btn.remove {
-        border-color: #e50914;
-        color: #e50914;
-    }
-
-    .empty-list {
-        text-align: center;
-        padding: 80px 0;
-        color: #808080;
-    }
-
-    .empty-icon {
-        font-size: 80px;
-        margin-bottom: 20px;
-    }
-
-    .empty-title {
-        font-size: 24px;
-        color: white;
-        margin-bottom: 10px;
-    }
-
-    .empty-text {
-        font-size: 16px;
-        margin-bottom: 30px;
-    }
+    .empty-list { text-align: center; padding: 80px 0; color: #808080; }
+    .empty-icon { font-size: 80px; margin-bottom: 20px; }
+    .empty-title { font-size: 24px; color: white; margin-bottom: 10px; }
+    .empty-text { font-size: 16px; margin-bottom: 30px; }
 
     .empty-btn {
         display: inline-block;
@@ -223,51 +57,16 @@
         transition: background 0.3s;
     }
 
-    .empty-btn:hover {
-        background: #f40612;
-    }
+    .empty-btn:hover { background: #f40612; }
 
-    /* Responsive */
     @media (max-width: 768px) {
-        .navbar {
-            padding: 0 20px;
-        }
-
-        .nav-links {
-            display: none;
-        }
-
-        .mylist-section {
-            padding: 100px 20px 40px;
-        }
-
-        .mylist-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
+        .mylist-section { padding: 100px 20px 40px; }
+        .mylist-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<!-- Navbar -->
-<nav class="navbar">
-    <a href="{{ url_for('home') }}" class="logo">TORRES<span>FLIX</span></a>
-    <ul class="nav-links">
-        <li><a href="{{ url_for('home') }}">Inicio</a></li>
-        <li><a href="#">Series</a></li>
-        <li><a href="#">Peliculas</a></li>
-        <li><a href="{{ url_for('my_list') }}" style="color: white;">Mi lista</a></li>
-    </ul>
-    <div class="nav-right">
-        <button class="icon-btn" onclick="window.location.href='{{ url_for('search') }}'">🔍</button>
-        <button class="icon-btn">🔔</button>
-        <a href="{{ url_for('my_list') }}" class="icon-btn">📁</a>
-        <button class="profile-btn">{{ session.user_name[0] }}</button>
-    </div>
-</nav>
-
-<!-- My List Section -->
 <section class="mylist-section">
     <div class="mylist-header">
         <h1 class="mylist-title">Mi Lista</h1>
@@ -283,8 +82,8 @@
                 <div class="mylist-card-title">{{ movie.title }}</div>
                 <div class="mylist-card-meta">{{ movie.match }}% coincidencia</div>
                 <div class="mylist-card-actions">
-                    <button class="card-btn play" onclick="showNotification('Reproduciendo {{ movie.title }}')">▶</button>
-                    <button class="card-btn remove" onclick="removeFromList({{ movie.id }})">✓</button>
+                    <button class="card-btn play" onclick="event.stopPropagation(); window.location.href='{{ url_for('movie_detail', movie_id=movie.id) }}'">▶</button>
+                    <button class="card-btn remove" onclick="event.stopPropagation(); removeFromList({{ movie.id }})">✕</button>
                 </div>
             </div>
         </div>
@@ -299,12 +98,6 @@
     </div>
     {% endif %}
 </section>
-
-<!-- Notification -->
-<div class="notification" id="notification">
-    <span class="notification-icon">✓</span>
-    <span id="notificationText"></span>
-</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -312,15 +105,19 @@
     function removeFromList(movieId) {
         fetch('/api/toggle-list', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ movie_id: movieId })
         })
         .then(response => response.json())
         .then(data => {
             if (!data.added) {
-                document.getElementById('card' + movieId).style.display = 'none';
+                const card = document.getElementById('card' + movieId);
+                if (card) {
+                    card.style.transition = 'opacity 0.3s, transform 0.3s';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
+                    setTimeout(() => card.remove(), 300);
+                }
                 showNotification('Eliminado de Mi lista');
             }
         });

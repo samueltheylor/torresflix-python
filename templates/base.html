@@ -8,7 +8,72 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% block navbar %}
+    {% if session.user %}
+    <nav class="navbar {% block navbar_class %}{% endblock %}" id="navbar">
+        <a href="{{ url_for('home') }}" class="logo">TORRES<span>FLIX</span></a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Inicio</a></li>
+            <li><a href="{{ url_for('browse', category='action') }}" class="{% if request.args.get('category') == 'action' %}active{% endif %}">Peliculas</a></li>
+            <li><a href="{{ url_for('browse', category='comedies') }}" class="{% if request.args.get('category') == 'comedies' %}active{% endif %}">Series</a></li>
+            <li><a href="{{ url_for('my_list') }}" class="{% if request.endpoint == 'my_list' %}active{% endif %}">Mi lista</a></li>
+        </ul>
+        <div class="nav-right">
+            <div class="search-container">
+                <div class="search-box" id="searchBox">
+                    <input type="text" placeholder="Buscar peliculas, series..." id="searchInput">
+                </div>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            <button class="icon-btn" onclick="toggleSearch()">🔍</button>
+            <button class="icon-btn">🔔</button>
+            <div style="position: relative;">
+                <button class="profile-btn" id="profileBtn" onclick="toggleProfileMenu()">{{ session.user_name[0] }}</button>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="{{ url_for('profiles') }}">Cambiar perfil</a>
+                    <div class="divider"></div>
+                    <a href="{{ url_for('home') }}">Cuenta</a>
+                    <a href="{{ url_for('home') }}">Centro de ayuda</a>
+                    <div class="divider"></div>
+                    <a href="{{ url_for('logout') }}">Cerrar sesion</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+    {% endblock %}
+
     {% block body %}{% endblock %}
+
+    {% block footer %}
+    {% if session.user and request.endpoint != 'profiles' %}
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">TORRES<span>FLIX</span></div>
+            <div class="footer-links">
+                <a href="#">Centro de ayuda</a>
+                <a href="#">Terminos de uso</a>
+                <a href="#">Privacidad</a>
+                <a href="#">Informacion corporativa</a>
+                <a href="#">Contacto</a>
+                <a href="#">Cuenta</a>
+                <a href="#">Dispositivos compatibles</a>
+                <a href="#">Accesibilidad</a>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 TorresFlix. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+    {% endif %}
+    {% endblock %}
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span class="notification-icon">✓</span>
+        <span id="notificationText"></span>
+    </div>
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
