@@ -1,0 +1,113 @@
+[
+  {
+    "name": "Watcher",
+    "parent": "entity",
+    "texture": "watcher",
+    "textureSize": [64, 64],
+    "models": [
+      {
+        "part": "Body",
+        "id": "body",
+        "invertAxis": "xy",
+        "translate": [0, -12, 0],
+        "boxes": [
+          {
+            "coordinates": [-2, 0, -2, 4, 12, 4],
+            "textureOffset": [0, 0]
+          }
+        ]
+      },
+      {
+        "part": "Head",
+        "id": "head",
+        "parent": "body",
+        "invertAxis": "xy",
+        "translate": [0, -24, 0],
+        "boxes": [
+          {
+            "coordinates": [-3, 18, -3, 6, 6, 6],
+            "textureOffset": [0, 16]
+          }
+        ]
+      },
+      {
+        "part": "Eye Left",
+        "id": "eye_left",
+        "parent": "head",
+        "invertAxis": "xy",
+        "translate": [-1, -27, 3],
+        "boxes": [
+          {
+            "coordinates": [-2, 26, -3.5, 2, 3, 1],
+            "textureOffset": [24, 0]
+          }
+        ]
+      },
+      {
+        "part": "Eye Right",
+        "id": "eye_right",
+        "parent": "head",
+        "invertAxis": "xy",
+        "translate": [1, -27, 3],
+        "boxes": [
+          {
+            "coordinates": [0, 26, -3.5, 2, 3, 1],
+            "textureOffset": [30, 0]
+          }
+        ]
+      },
+      {
+        "part": "Arm Left",
+        "id": "arm_left",
+        "parent": "body",
+        "invertAxis": "xy",
+        "translate": [-2, -18, 0],
+        "boxes": [
+          {
+            "coordinates": [-4, 10, -1, 2, 8, 2],
+            "textureOffset": [36, 0]
+          }
+        ]
+      },
+      {
+        "part": "Arm Right",
+        "id": "arm_right",
+        "parent": "body",
+        "invertAxis": "xy",
+        "translate": [2, -18, 0],
+        "boxes": [
+          {
+            "coordinates": [2, 10, -1, 2, 8, 2],
+            "textureOffset": [44, 0]
+          }
+        ]
+      },
+      {
+        "part": "Leg Left",
+        "id": "leg_left",
+        "parent": "body",
+        "invertAxis": "xy",
+        "translate": [-1, 0, 0],
+        "boxes": [
+          {
+            "coordinates": [-2, -8, -1, 2, 8, 2],
+            "textureOffset": [0, 32]
+          }
+        ]
+      },
+      {
+        "part": "Leg Right",
+        "id": "leg_right",
+        "parent": "body",
+        "invertAxis": "xy",
+        "translate": [1, 0, 0],
+        "boxes": [
+          {
+            "coordinates": [0, -8, -1, 2, 8, 2],
+            "textureOffset": [8, 32]
+          }
+        ]
+      }
+    ]
+  }
+]
