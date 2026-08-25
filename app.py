@@ -1,11 +1,99 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, abort
 import json
 import os
+import sqlite3
+import unicodedata
 from functools import wraps
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'torresflix_secret_key_2024'
+app.secret_key = os.environ.get('TORRESFLIX_SECRET_KEY', 'dev-only-change-me')
+
+DB_PATH = os.environ.get(
+    'TORRESFLIX_DB_PATH',
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), 'torresflix.db')
+)
+PROFILE_NAMES = {
+    'principal': 'Principal',
+    'ninos': 'Niños',
+    'invitado': 'Invitado',
+}
+
+def init_db():
+    with sqlite3.connect(DB_PATH) as db:
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS user_state (
+                state_key TEXT PRIMARY KEY,
+                username TEXT NOT NULL,
+                profile TEXT NOT NULL,
+                my_list TEXT NOT NULL DEFAULT '[]',
+                likes TEXT NOT NULL DEFAULT '[]',
+                ratings TEXT NOT NULL DEFAULT '{}',
+                progress TEXT NOT NULL DEFAULT '{}',
+                updated_at TEXT NOT NULL
+            )
+        """)
+
+def state_key():
+    return f"{session.get('user', '')}:{session.get('profile', 'principal')}"
+
+def load_state():
+    key = state_key()
+    username = session.get('user')
+    profile = session.get('profile', 'principal')
+    if not username:
+        return {'my_list': [], 'likes': [], 'ratings': {}, 'progress': {}}
+    with sqlite3.connect(DB_PATH) as db:
+        row = db.execute(
+            'SELECT my_list, likes, ratings, progress FROM user_state WHERE state_key = ?',
+            (key,)
+        ).fetchone()
+        if row is None:
+            now = datetime.utcnow().isoformat()
+            db.execute(
+                'INSERT INTO user_state(state_key, username, profile, updated_at) VALUES (?, ?, ?, ?)',
+                (key, username, profile, now)
+            )
+            return {'my_list': [], 'likes': [], 'ratings': {}, 'progress': {}}
+    return {
+        'my_list': json.loads(row[0] or '[]'),
+        'likes': json.loads(row[1] or '[]'),
+        'ratings': json.loads(row[2] or '{}'),
+        'progress': json.loads(row[3] or '{}'),
+    }
+
+def save_state(state):
+    username = session.get('user')
+    if not username:
+        return
+    with sqlite3.connect(DB_PATH) as db:
+        db.execute(
+            '''INSERT INTO user_state(state_key, username, profile, my_list, likes, ratings, progress, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+               ON CONFLICT(state_key) DO UPDATE SET
+                 my_list=excluded.my_list, likes=excluded.likes,
+                 ratings=excluded.ratings, progress=excluded.progress,
+                 updated_at=excluded.updated_at''',
+            (
+                state_key(), username, session.get('profile', 'principal'),
+                json.dumps(state.get('my_list', [])),
+                json.dumps(state.get('likes', [])),
+                json.dumps(state.get('ratings', {})),
+                json.dumps(state.get('progress', {})),
+                datetime.utcnow().isoformat(),
+            )
+        )
+
+def normalize(value):
+    return ''.join(
+        char for char in unicodedata.normalize('NFKD', str(value))
+        if not unicodedata.combining(char)
+    ).casefold()
+
+def valid_movie_id(value):
+    return isinstance(value, int) and not isinstance(value, bool) and value in MOVIES_DB
+
+init_db()
 
 # Base de datos de peliculas
 MOVIES_DB = {
@@ -373,8 +461,11 @@ def login():
         password = request.form.get('password')
         
         if username in USERS_DB and USERS_DB[username]['password'] == password:
+            session.clear()
             session['user'] = username
             session['user_name'] = USERS_DB[username]['name']
+            session['profile'] = 'principal'
+            load_state()
             return redirect(url_for('profiles'))
         
         return render_template('login.html', error='Usuario o contraseña incorrectos')
@@ -417,10 +508,15 @@ def movie_detail(movie_id):
     similar = [m for m in MOVIES_DB.values() 
                if m['category'] == movie['category'] and m['id'] != movie['id']][:4]
     
-    in_list = movie_id in session.get('my_list', [])
-    liked = movie_id in session.get('likes', [])
+    user_state = load_state()
+    in_list = movie_id in user_state['my_list']
+    liked = movie_id in user_state['likes']
+    progress = user_state['progress'].get(str(movie_id), {})
     
-    return render_template('movie.html', movie=movie, similar=similar, in_list=in_list, liked=liked)
+    return render_template(
+        'movie.html', movie=movie, similar=similar, in_list=in_list,
+        liked=liked, progress=progress
+    )
 
 @app.route('/browse')
 @login_required
@@ -441,16 +537,16 @@ def browse():
 @app.route('/search')
 @login_required
 def search():
-    query = request.args.get('q', '').lower()
+    query = normalize(request.args.get('q', '').strip())
     results = []
     all_years = sorted(set(m['year'] for m in MOVIES_DB.values()), reverse=True)
     all_genres = sorted(set(g for m in MOVIES_DB.values() for g in m['genres']))
 
     if query:
         for movie in MOVIES_DB.values():
-            if (query in movie['title'].lower() or 
-                query in ' '.join(movie['genres']).lower() or
-                query in ' '.join(movie['cast']).lower()):
+            if (query in normalize(movie['title']) or 
+                query in normalize(' '.join(movie['genres'])) or
+                query in normalize(' '.join(movie['cast']))):
                 results.append(movie)
     else:
         results = sorted(MOVIES_DB.values(), key=lambda m: m['match'], reverse=True)[:12]
@@ -460,7 +556,7 @@ def search():
 @app.route('/my-list')
 @login_required
 def my_list():
-    user_list = session.get('my_list', [])
+    user_list = load_state()['my_list']
     movies = [MOVIES_DB[mid] for mid in user_list if mid in MOVIES_DB]
     return render_template('mylist.html', movies=movies)
 
@@ -469,20 +565,16 @@ def my_list():
 def toggle_list():
     data = request.get_json(silent=True) or {}
     movie_id = data.get('movie_id')
-    if not isinstance(movie_id, int) or isinstance(movie_id, bool) or movie_id not in MOVIES_DB:
+    if not valid_movie_id(movie_id):
         return jsonify({'error': 'movie_id must be an existing integer'}), 400
-
-    if 'my_list' not in session:
-        session['my_list'] = []
-    
-    if movie_id in session['my_list']:
-        session['my_list'].remove(movie_id)
+    state = load_state()
+    if movie_id in state['my_list']:
+        state['my_list'].remove(movie_id)
         added = False
     else:
-        session['my_list'].append(movie_id)
+        state['my_list'].append(movie_id)
         added = True
-    
-    session.modified = True
+    save_state(state)
     return jsonify({'added': added})
 
 @app.route('/api/toggle-like', methods=['POST'])
@@ -490,48 +582,44 @@ def toggle_list():
 def toggle_like():
     data = request.get_json(silent=True) or {}
     movie_id = data.get('movie_id')
-    if not isinstance(movie_id, int) or isinstance(movie_id, bool) or movie_id not in MOVIES_DB:
+    if not valid_movie_id(movie_id):
         return jsonify({'error': 'movie_id must be an existing integer'}), 400
-
-    if 'likes' not in session:
-        session['likes'] = []
-    
-    if movie_id in session['likes']:
-        session['likes'].remove(movie_id)
+    state = load_state()
+    if movie_id in state['likes']:
+        state['likes'].remove(movie_id)
         liked = False
     else:
-        session['likes'].append(movie_id)
+        state['likes'].append(movie_id)
         liked = True
-    
-    session.modified = True
+    save_state(state)
     return jsonify({'liked': liked})
 
 @app.route('/api/get-likes')
 @login_required
 def get_likes():
-    return jsonify(session.get('likes', []))
+    return jsonify(load_state()['likes'])
 
 @app.route('/api/search')
 @login_required
 def api_search():
-    query = request.args.get('q', '').lower()
-    genre = request.args.get('genre', '').lower()
+    query = normalize(request.args.get('q', '').strip())
+    genre = normalize(request.args.get('genre', '').strip())
     year = request.args.get('year', '')
     category = request.args.get('category', '')
     min_rating = request.args.get('min_rating', 0, type=int)
     
     results = []
-    user_ratings = session.get('ratings', {})
+    user_ratings = load_state()['ratings']
     
     for movie in MOVIES_DB.values():
         if query:
-            if not (query in movie['title'].lower() or 
-                   query in ' '.join(movie['genres']).lower() or
-                   query in ' '.join(movie['cast']).lower() or
-                   query in movie.get('description', '').lower()):
+            if not (query in normalize(movie['title']) or 
+                   query in normalize(' '.join(movie['genres'])) or
+                   query in normalize(' '.join(movie['cast'])) or
+                   query in normalize(movie.get('description', ''))):
                 continue
         
-        if genre and not any(genre in g.lower() for g in movie['genres']):
+        if genre and not any(genre in normalize(g) for g in movie['genres']):
             continue
         
         if year and str(movie['year']) != year:
@@ -563,23 +651,17 @@ def rate_movie():
     data = request.get_json(silent=True) or {}
     movie_id = data.get('movie_id')
     rating = data.get('rating')
-
-    if (not isinstance(movie_id, int) or isinstance(movie_id, bool) or movie_id not in MOVIES_DB or
-            not isinstance(rating, int) or isinstance(rating, bool) or not 1 <= rating <= 5):
+    if not valid_movie_id(movie_id) or not isinstance(rating, int) or isinstance(rating, bool) or not 1 <= rating <= 5:
         return jsonify({'error': 'movie_id and rating (1-5) are required'}), 400
-
-    if 'ratings' not in session:
-        session['ratings'] = {}
-    
-    session['ratings'][str(movie_id)] = rating
-    session.modified = True
-    
+    state = load_state()
+    state['ratings'][str(movie_id)] = rating
+    save_state(state)
     return jsonify({'success': True, 'rating': rating})
 
 @app.route('/api/get-ratings')
 @login_required
 def get_ratings():
-    ratings = session.get('ratings', {})
+    ratings = load_state()['ratings']
     return jsonify(ratings)
 
 @app.route('/profiles')
