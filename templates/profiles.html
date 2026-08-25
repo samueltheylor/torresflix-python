@@ -206,7 +206,7 @@
     <h1 class="profiles-title">¿Quien esta viendo?</h1>
     
     <div class="profiles-grid">
-        <div class="profile-card" onclick="selectProfile('admin', this)">
+        <div class="profile-card" onclick="selectProfile('principal', this)">
             <div class="profile-avatar p1">{{ session.user_name[0] if session.user_name else 'A' }}</div>
             <div class="profile-name">{{ session.user_name if session.user_name else 'Admin' }}</div>
         </div>
