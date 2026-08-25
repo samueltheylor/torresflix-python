@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, abort
+from werkzeug.security import check_password_hash
 import json
 import os
 import secrets
@@ -455,8 +456,14 @@ MOVIES_DB = {
 
 # Usuarios simulados
 USERS_DB = {
-    "admin": {"password": "admin123", "name": "Admin", "profile_pic": "A"},
-    "user": {"password": "user123", "name": "Usuario", "profile_pic": "U"}
+    "admin": {
+        "password_hash": "pbkdf2:sha256:600000$torresflix-admin$188109e855c89f74d0eff154b93899a9d6387863f5f314760293fbd922ab2f70",
+        "name": "Admin", "profile_pic": "A"
+    },
+    "user": {
+        "password_hash": "pbkdf2:sha256:600000$torresflix-user$768e33d74f43479eab0da5d1a55aa8c156542274196d760c3ccd4fad2a210560",
+        "name": "Usuario", "profile_pic": "U"
+    }
 }
 
 def login_required(f):
@@ -479,7 +486,7 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        if username in USERS_DB and USERS_DB[username]['password'] == password:
+        if username in USERS_DB and check_password_hash(USERS_DB[username]['password_hash'], password):
             session.clear()
             session['user'] = username
             session['user_name'] = USERS_DB[username]['name']
