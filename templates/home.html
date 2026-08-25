@@ -204,6 +204,20 @@
         gap: 8px;
     }
 
+    .continue-progress {
+        height: 4px;
+        background: #444;
+        border-radius: 4px;
+        margin-top: 8px;
+        overflow: hidden;
+    }
+
+    .continue-progress span {
+        display: block;
+        height: 100%;
+        background: #e50914;
+    }
+
     @media (max-width: 1024px) {
         .hero { padding: 0 30px 80px; }
         .hero-title { font-size: 44px; }
@@ -248,6 +262,28 @@
 
 <!-- Content Section -->
 <section class="content-section">
+    {% if continue_watching %}
+    <!-- Continue Watching -->
+    <div class="content-row">
+        <div class="row-header">
+            <h2 class="row-title">Seguir viendo</h2>
+            <span class="row-see-all" style="cursor:default;">Tu progreso</span>
+        </div>
+        <div class="row-slider">
+            {% for movie in continue_watching %}
+            <div class="card" onclick="window.location.href='{{ url_for('movie_detail', movie_id=movie.id) }}'">
+                <img src="{{ movie.image }}" alt="{{ movie.title }}">
+                <div class="card-overlay" style="opacity:1;">
+                    <div class="card-title">{{ movie.title }}</div>
+                    <div class="card-meta">{{ movie.progress_percent }}% visto</div>
+                    <div class="continue-progress"><span style="width:{{ movie.progress_percent }}%;"></span></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Trending Now -->
     <div class="content-row">
         <div class="row-header">
