@@ -781,7 +781,6 @@ def select_profile():
     return jsonify({'success': True, 'profile': profile})
 
 @app.route('/info/<slug>')
-@login_required
 def info(slug):
     pages = {
         'help': ('Centro de ayuda', 'Encuentra respuestas y soporte para usar TorresFlix.'),
