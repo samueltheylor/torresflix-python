@@ -28,7 +28,7 @@
                 <div class="search-results" id="searchResults"></div>
             </div>
             <button class="icon-btn" onclick="toggleSearch()">🔍</button>
-            <button class="icon-btn">🔔</button>
+            <button class="icon-btn" aria-label="Notificaciones" onclick="showNotification('No hay notificaciones nuevas')">🔔</button>
             <div style="position: relative;">
                 <button class="profile-btn" id="profileBtn" onclick="toggleProfileMenu()">{{ (session.get('profile_name') or session.user_name)[0] }}</button>
                 <div class="profile-dropdown" id="profileDropdown">
