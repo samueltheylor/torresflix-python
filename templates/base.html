@@ -12,6 +12,7 @@
     {% if session.user %}
     <nav class="navbar {% block navbar_class %}{% endblock %}" id="navbar">
         <a href="{{ url_for('home') }}" class="logo">TORRES<span>FLIX</span></a>
+        <button class="mobile-menu-btn" aria-label="Abrir menu" onclick="toggleMobileMenu()">☰</button>
         <ul class="nav-links">
             <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Inicio</a></li>
             <li><a href="{{ url_for('browse', type='movie') }}" class="{% if request.args.get('type') == 'movie' %}active{% endif %}">Peliculas</a></li>
