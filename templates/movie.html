@@ -380,7 +380,7 @@
         const percent = forceComplete ? 100 : (videoElement.currentTime / videoElement.duration) * 100;
         fetch('/api/progress', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.TORRESFLIX_CSRF || '' },
             body: JSON.stringify({
                 movie_id: {{ movie.id }},
                 position: videoElement.currentTime,
@@ -429,7 +429,7 @@
     function rateMovie(movieId, rating) {
         fetch('/api/rate', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.TORRESFLIX_CSRF || '' },
             body: JSON.stringify({ movie_id: movieId, rating: rating })
         })
         .then(response => response.json())
