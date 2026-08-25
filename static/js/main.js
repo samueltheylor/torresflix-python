@@ -50,20 +50,24 @@ function toggleList(movieId) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ movie_id: movieId })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error('List update failed');
+        return response.json();
+    })
     .then(data => {
         const btn = document.getElementById('listBtn' + movieId) || document.getElementById('listBtn');
+        const detailButton = btn && btn.id === 'listBtn';
         if (data.added) {
             showNotification('Agregado a Mi lista');
             if (btn) {
                 btn.classList.add('added');
-                btn.innerHTML = '✓';
+                btn.innerHTML = detailButton ? '✓ Mi lista' : '✓';
             }
         } else {
             showNotification('Eliminado de Mi lista');
             if (btn) {
                 btn.classList.remove('added');
-                btn.innerHTML = '+';
+                btn.innerHTML = detailButton ? '+ Mi lista' : '+';
             }
         }
     })
@@ -77,20 +81,24 @@ function toggleLike(movieId) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ movie_id: movieId })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error('Like update failed');
+        return response.json();
+    })
     .then(data => {
         const btn = document.getElementById('likeBtn' + movieId) || document.getElementById('likeBtn');
+        const detailButton = btn && btn.id === 'likeBtn';
         if (data.liked) {
             showNotification('Me gusta!');
             if (btn) {
                 btn.classList.add('liked');
-                btn.innerHTML = '❤';
+                btn.innerHTML = detailButton ? '❤ Me gusta' : '❤';
             }
         } else {
             showNotification('Eliminado de Me gusta');
             if (btn) {
                 btn.classList.remove('liked');
-                btn.innerHTML = '👍';
+                btn.innerHTML = detailButton ? '👍 Me gusta' : '👍';
             }
         }
     })
