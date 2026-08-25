@@ -14,9 +14,10 @@
         <a href="{{ url_for('home') }}" class="logo">TORRES<span>FLIX</span></a>
         <ul class="nav-links">
             <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Inicio</a></li>
-            <li><a href="{{ url_for('browse', category='action') }}" class="{% if request.args.get('category') == 'action' %}active{% endif %}">Peliculas</a></li>
-            <li><a href="{{ url_for('browse', category='comedies') }}" class="{% if request.args.get('category') == 'comedies' %}active{% endif %}">Series</a></li>
+            <li><a href="{{ url_for('browse', type='movie') }}" class="{% if request.args.get('type') == 'movie' %}active{% endif %}">Peliculas</a></li>
+            <li><a href="{{ url_for('browse', type='series') }}" class="{% if request.args.get('type') == 'series' %}active{% endif %}">Series</a></li>
             <li><a href="{{ url_for('my_list') }}" class="{% if request.endpoint == 'my_list' %}active{% endif %}">Mi lista</a></li>
+            <li><a href="{{ url_for('likes') }}" class="{% if request.endpoint == 'likes' %}active{% endif %}">Me gusta</a></li>
         </ul>
         <div class="nav-right">
             <div class="search-container">
@@ -28,12 +29,12 @@
             <button class="icon-btn" onclick="toggleSearch()">🔍</button>
             <button class="icon-btn">🔔</button>
             <div style="position: relative;">
-                <button class="profile-btn" id="profileBtn" onclick="toggleProfileMenu()">{{ session.user_name[0] }}</button>
+                <button class="profile-btn" id="profileBtn" onclick="toggleProfileMenu()">{{ (session.get('profile_name') or session.user_name)[0] }}</button>
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="{{ url_for('profiles') }}">Cambiar perfil</a>
                     <div class="divider"></div>
-                    <a href="{{ url_for('home') }}">Cuenta</a>
-                    <a href="{{ url_for('home') }}">Centro de ayuda</a>
+                    <a href="{{ url_for('profiles') }}">Cuenta</a>
+                    <a href="{{ url_for('info', slug='help') }}">Centro de ayuda</a>
                     <div class="divider"></div>
                     <a href="{{ url_for('logout') }}">Cerrar sesion</a>
                 </div>
@@ -51,14 +52,13 @@
         <div class="footer-content">
             <div class="footer-logo">TORRES<span>FLIX</span></div>
             <div class="footer-links">
-                <a href="#">Centro de ayuda</a>
-                <a href="#">Terminos de uso</a>
-                <a href="#">Privacidad</a>
-                <a href="#">Informacion corporativa</a>
-                <a href="#">Contacto</a>
-                <a href="#">Cuenta</a>
-                <a href="#">Dispositivos compatibles</a>
-                <a href="#">Accesibilidad</a>
+                <a href="{{ url_for('info', slug='help') }}">Centro de ayuda</a>
+                <a href="{{ url_for('info', slug='terms') }}">Terminos de uso</a>
+                <a href="{{ url_for('info', slug='privacy') }}">Privacidad</a>
+                <a href="{{ url_for('info', slug='contact') }}">Contacto</a>
+                <a href="{{ url_for('profiles') }}">Cuenta</a>
+                <a href="{{ url_for('home') }}">Dispositivos compatibles</a>
+                <a href="{{ url_for('home') }}">Accesibilidad</a>
             </div>
             <div class="footer-bottom">
                 &copy; 2026 TorresFlix. Todos los derechos reservados.
