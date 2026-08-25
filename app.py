@@ -490,13 +490,21 @@ def home():
     action = [m for m in MOVIES_DB.values() if m['category'] == 'action']
     comedies = [m for m in MOVIES_DB.values() if m['category'] == 'comedies']
     documentaries = [m for m in MOVIES_DB.values() if m['category'] == 'documentaries']
+    user_state = load_state()
+    continue_watching = []
+    for movie_id, progress in user_state['progress'].items():
+        movie = MOVIES_DB.get(int(movie_id)) if str(movie_id).isdigit() else None
+        if movie and progress.get('percent', 0) > 0 and progress.get('percent', 0) < 95:
+            continue_watching.append({**movie, 'progress_percent': progress['percent']})
+    continue_watching.sort(key=lambda movie: movie['progress_percent'], reverse=True)
     
     return render_template('home.html', 
                          featured=featured,
                          trending=trending,
                          action=action,
                          comedies=comedies,
-                         documentaries=documentaries)
+                         documentaries=documentaries,
+                         continue_watching=continue_watching)
 
 @app.route('/movie/<int:movie_id>')
 @login_required
@@ -639,7 +647,7 @@ def api_search():
             'year': movie['year'],
             'genres': movie['genres'],
             'match': movie['match'],
-            'rating': movie.get('user_rating', 0),
+            'rating': movie_rating,
             'duration': movie['duration']
         })
     
@@ -663,6 +671,73 @@ def rate_movie():
 def get_ratings():
     ratings = load_state()['ratings']
     return jsonify(ratings)
+
+@app.route('/likes')
+@login_required
+def likes():
+    liked_ids = load_state()['likes']
+    movies = [MOVIES_DB[mid] for mid in liked_ids if mid in MOVIES_DB]
+    return render_template('likes.html', movies=movies)
+
+@app.route('/api/progress', methods=['GET', 'POST'])
+@login_required
+def progress():
+    state = load_state()
+    if request.method == 'GET':
+        movie_id = request.args.get('movie_id', type=int)
+        if not valid_movie_id(movie_id):
+            return jsonify({'error': 'movie_id must be an existing integer'}), 400
+        return jsonify(state['progress'].get(str(movie_id), {}))
+
+    data = request.get_json(silent=True) or {}
+    movie_id = data.get('movie_id')
+    position = data.get('position')
+    duration = data.get('duration')
+    percent = data.get('percent')
+    if not valid_movie_id(movie_id) or not isinstance(position, (int, float)) or position < 0:
+        return jsonify({'error': 'movie_id and non-negative position are required'}), 400
+    if duration is not None and (not isinstance(duration, (int, float)) or duration <= 0):
+        return jsonify({'error': 'duration must be positive'}), 400
+    if percent is None and duration:
+        percent = round(position / duration * 100, 2)
+    if not isinstance(percent, (int, float)) or percent < 0 or percent > 100:
+        return jsonify({'error': 'percent must be between 0 and 100'}), 400
+    if percent >= 95:
+        state['progress'].pop(str(movie_id), None)
+    else:
+        state['progress'][str(movie_id)] = {
+            'position': round(position, 2),
+            'duration': round(duration, 2) if duration else None,
+            'percent': round(percent, 2),
+        }
+    save_state(state)
+    return jsonify({'success': True, 'progress': state['progress'].get(str(movie_id), {})})
+
+@app.route('/api/select-profile', methods=['POST'])
+@login_required
+def select_profile():
+    data = request.get_json(silent=True) or {}
+    profile = data.get('profile')
+    if profile not in PROFILE_NAMES:
+        return jsonify({'error': 'unknown profile'}), 400
+    session['profile'] = profile
+    session['profile_name'] = PROFILE_NAMES[profile]
+    load_state()
+    return jsonify({'success': True, 'profile': profile})
+
+@app.route('/info/<slug>')
+@login_required
+def info(slug):
+    pages = {
+        'help': ('Centro de ayuda', 'Encuentra respuestas y soporte para usar TorresFlix.'),
+        'terms': ('Terminos de uso', 'Este prototipo es una experiencia de demostracion.'),
+        'privacy': ('Privacidad', 'Tus preferencias se guardan por usuario y perfil en la base local.'),
+        'contact': ('Contacto', 'Escribe a soporte@torresflix.local para este prototipo.'),
+    }
+    if slug not in pages:
+        abort(404)
+    title, text = pages[slug]
+    return render_template('info.html', info_title=title, info_text=text)
 
 @app.route('/profiles')
 @login_required
