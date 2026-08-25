@@ -466,6 +466,35 @@ USERS_DB = {
     }
 }
 
+def init_users():
+    with sqlite3.connect(DB_PATH) as db:
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                username TEXT PRIMARY KEY,
+                password_hash TEXT NOT NULL,
+                name TEXT NOT NULL,
+                profile_pic TEXT NOT NULL
+            )
+        """)
+        for username, user in USERS_DB.items():
+            db.execute(
+                'INSERT OR IGNORE INTO users(username, password_hash, name, profile_pic) VALUES (?, ?, ?, ?)',
+                (username, user['password_hash'], user['name'], user['profile_pic'])
+            )
+
+def get_user(username):
+    with sqlite3.connect(DB_PATH) as db:
+        row = db.execute(
+            'SELECT username, password_hash, name, profile_pic FROM users WHERE username = ?',
+            (username,)
+        ).fetchone()
+    if not row:
+        return None
+    return dict(zip(('username', 'password_hash', 'name', 'profile_pic'), row))
+
+init_users()
+
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -486,10 +515,11 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        if username in USERS_DB and check_password_hash(USERS_DB[username]['password_hash'], password):
+        user = get_user(username)
+        if user and check_password_hash(user['password_hash'], password):
             session.clear()
             session['user'] = username
-            session['user_name'] = USERS_DB[username]['name']
+            session['user_name'] = user['name']
             session['profile'] = 'principal'
             load_state()
             return redirect(url_for('profiles'))
