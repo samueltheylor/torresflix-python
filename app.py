@@ -529,18 +529,37 @@ def movie_detail(movie_id):
 @app.route('/browse')
 @login_required
 def browse():
-    category = request.args.get('category', 'trending')
+    category = request.args.get('category')
+    content_type = request.args.get('type')
     category_names = {
         'trending': 'Tendencias',
         'action': 'Accion y aventura',
         'comedies': 'Comedias',
         'documentaries': 'Documentales'
     }
-    if category not in category_names:
+    if category and category not in category_names:
+        abort(404)
+    if content_type and content_type not in {'movie', 'series'}:
         abort(404)
 
-    movies = [m for m in MOVIES_DB.values() if m['category'] == category]
-    return render_template('browse.html', movies=movies, category=category, category_name=category_names[category])
+    movies = list(MOVIES_DB.values())
+    if category:
+        movies = [m for m in movies if m['category'] == category]
+    if content_type:
+        movies = [
+            m for m in movies
+            if m.get('content_type', 'movie') == content_type
+        ]
+    if category:
+        category_name = category_names[category]
+    elif content_type == 'series':
+        category_name = 'Series'
+    else:
+        category_name = 'Peliculas'
+    return render_template(
+        'browse.html', movies=movies, category=category or '',
+        content_type=content_type or '', category_name=category_name
+    )
 
 @app.route('/search')
 @login_required
