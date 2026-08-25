@@ -236,9 +236,23 @@
         setTimeout(() => {
             document.getElementById('loadingOverlay').classList.add('active');
         }, 300);
-        setTimeout(() => {
+        fetch('/api/select-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ profile })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Profile selection failed');
+            return response.json();
+        })
+        .then(() => {
             window.location.href = '{{ url_for("home") }}';
-        }, 900);
+        })
+        .catch(() => {
+            document.getElementById('loadingOverlay').classList.remove('active');
+            element.classList.remove('selected');
+            showNotification('No se pudo cambiar el perfil');
+        });
     }
 
     document.addEventListener('click', function(e) {
