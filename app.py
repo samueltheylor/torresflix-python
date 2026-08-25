@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, abort
 import json
 import os
+import secrets
 import sqlite3
 import unicodedata
 from functools import wraps
@@ -18,6 +19,24 @@ PROFILE_NAMES = {
     'ninos': 'Niños',
     'invitado': 'Invitado',
 }
+
+def csrf_token():
+    token = session.get('csrf_token')
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session['csrf_token'] = token
+    return token
+
+app.jinja_env.globals['csrf_token'] = csrf_token
+
+@app.before_request
+def protect_api_mutations():
+    if request.method == 'POST' and request.path.startswith('/api/'):
+        expected = session.get('csrf_token')
+        provided = request.headers.get('X-CSRF-Token', '')
+        if not expected or not provided or not secrets.compare_digest(expected, provided):
+            return jsonify({'error': 'invalid csrf token'}), 400
+
 
 def init_db():
     with sqlite3.connect(DB_PATH) as db:
