@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Pagina no encontrada - TorresFlix{% endblock %}
+{% block navbar_class %}solid{% endblock %}
+
+{% block body %}
+<main style="min-height:65vh; display:grid; place-items:center; padding:120px 24px 60px; text-align:center;">
+    <div>
+        <div style="font-size:80px; margin-bottom:18px;">🎬</div>
+        <p style="color:#e50914; font-size:64px; font-weight:800; line-height:1;">404</p>
+        <h1 style="margin:12px 0;">Esta escena no existe</h1>
+        <p style="color:#999; margin-bottom:28px;">La pagina que buscas se fue a comerciales.</p>
+        <a class="btn btn-play" href="{{ url_for('home') }}">Volver al inicio</a>
+    </div>
+</main>
+{% endblock %}
