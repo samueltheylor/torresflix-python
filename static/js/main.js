@@ -20,6 +20,11 @@ function toggleSearch() {
     }
 }
 
+function toggleMobileMenu() {
+    const links = document.querySelector('.nav-links');
+    if (links) links.classList.toggle('open');
+}
+
 // Profile dropdown
 function toggleProfileMenu() {
     const dropdown = document.getElementById('profileDropdown');
