@@ -163,7 +163,7 @@
                 <select class="filter-select" id="genreFilter" onchange="performSearch()">
                     <option value="">Todos</option>
                     {% for genre in all_genres %}
-                    <option value="{{ genre }}">{{ genre }}</option>
+                    <option value="{{ genre }}" {% if request.args.get("genre", "")|lower == genre|lower %}selected{% endif %}>{{ genre }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -182,9 +182,9 @@
                 <span class="filter-label">Tu calificacion minima</span>
                 <select class="filter-select" id="ratingFilter" onchange="performSearch()">
                     <option value="0">Cualquiera</option>
-                    <option value="3">⭐ 3+</option>
-                    <option value="4">⭐ 4+</option>
-                    <option value="5">⭐ 5</option>
+                    <option value="3" {% if request.args.get("min_rating") == "3" %}selected{% endif %}>⭐ 3+</option>
+                    <option value="4" {% if request.args.get("min_rating") == "4" %}selected{% endif %}>⭐ 4+</option>
+                    <option value="5" {% if request.args.get("min_rating") == "5" %}selected{% endif %}>⭐ 5</option>
                 </select>
             </div>
         </div>
