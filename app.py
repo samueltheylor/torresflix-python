@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, abort
 import json
 import os
 from functools import wraps
@@ -432,9 +432,11 @@ def browse():
         'comedies': 'Comedias',
         'documentaries': 'Documentales'
     }
+    if category not in category_names:
+        abort(404)
+
     movies = [m for m in MOVIES_DB.values() if m['category'] == category]
-    name = category_names.get(category, category.title())
-    return render_template('browse.html', movies=movies, category=category, category_name=name)
+    return render_template('browse.html', movies=movies, category=category, category_name=category_names[category])
 
 @app.route('/search')
 @login_required
@@ -465,7 +467,11 @@ def my_list():
 @app.route('/api/toggle-list', methods=['POST'])
 @login_required
 def toggle_list():
-    movie_id = request.json.get('movie_id')
+    data = request.get_json(silent=True) or {}
+    movie_id = data.get('movie_id')
+    if not isinstance(movie_id, int) or isinstance(movie_id, bool) or movie_id not in MOVIES_DB:
+        return jsonify({'error': 'movie_id must be an existing integer'}), 400
+
     if 'my_list' not in session:
         session['my_list'] = []
     
@@ -482,7 +488,11 @@ def toggle_list():
 @app.route('/api/toggle-like', methods=['POST'])
 @login_required
 def toggle_like():
-    movie_id = request.json.get('movie_id')
+    data = request.get_json(silent=True) or {}
+    movie_id = data.get('movie_id')
+    if not isinstance(movie_id, int) or isinstance(movie_id, bool) or movie_id not in MOVIES_DB:
+        return jsonify({'error': 'movie_id must be an existing integer'}), 400
+
     if 'likes' not in session:
         session['likes'] = []
     
@@ -511,6 +521,7 @@ def api_search():
     min_rating = request.args.get('min_rating', 0, type=int)
     
     results = []
+    user_ratings = session.get('ratings', {})
     
     for movie in MOVIES_DB.values():
         if query:
@@ -529,7 +540,7 @@ def api_search():
         if category and movie['category'] != category:
             continue
         
-        movie_rating = movie.get('user_rating', 0)
+        movie_rating = user_ratings.get(str(movie['id']), 0)
         if min_rating and movie_rating < min_rating:
             continue
         
@@ -549,18 +560,19 @@ def api_search():
 @app.route('/api/rate', methods=['POST'])
 @login_required
 def rate_movie():
-    movie_id = request.json.get('movie_id')
-    rating = request.json.get('rating', 0)
-    
+    data = request.get_json(silent=True) or {}
+    movie_id = data.get('movie_id')
+    rating = data.get('rating')
+
+    if (not isinstance(movie_id, int) or isinstance(movie_id, bool) or movie_id not in MOVIES_DB or
+            not isinstance(rating, int) or isinstance(rating, bool) or not 1 <= rating <= 5):
+        return jsonify({'error': 'movie_id and rating (1-5) are required'}), 400
+
     if 'ratings' not in session:
         session['ratings'] = {}
     
     session['ratings'][str(movie_id)] = rating
     session.modified = True
-    
-    # Update average rating in MOVIES_DB
-    if movie_id in MOVIES_DB:
-        MOVIES_DB[movie_id]['user_rating'] = rating
     
     return jsonify({'success': True, 'rating': rating})
 
