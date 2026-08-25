@@ -11,7 +11,7 @@
     .search-header { margin-bottom: 40px; }
     .search-title { font-size: 36px; font-weight: bold; margin-bottom: 30px; }
 
-    .search-box { display: flex; gap: 15px; margin-bottom: 30px; }
+    .page-search-box { display: flex; gap: 15px; margin-bottom: 30px; }
 
     .search-input-wrapper { flex: 1; position: relative; }
 
@@ -135,7 +135,7 @@
 
     @media (max-width: 768px) {
         .search-section { padding: 100px 20px 40px; }
-        .search-box { flex-direction: column; }
+        .page-search-box { flex-direction: column; }
         .search-btn { width: 100%; }
         .filters { flex-direction: column; }
         .filter-select { width: 100%; }
@@ -149,10 +149,10 @@
     <div class="search-header">
         <h1 class="search-title">Buscar contenido</h1>
         
-        <div class="search-box">
+        <div class="page-search-box">
             <div class="search-input-wrapper">
                 <span class="search-icon">🔍</span>
-                <input type="text" class="search-input" id="searchInput" placeholder="Buscar por titulo, actor, genero..." value="{{ query }}">
+                <input type="text" class="search-input" id="pageSearchInput" placeholder="Buscar por titulo, actor, genero..." value="{{ query }}">
             </div>
             <button class="search-btn" onclick="performSearch()">Buscar</button>
         </div>
@@ -179,7 +179,7 @@
             </div>
             
             <div class="filter-group">
-                <span class="filter-label">Calificacion minima</span>
+                <span class="filter-label">Tu calificacion minima</span>
                 <select class="filter-select" id="ratingFilter" onchange="performSearch()">
                     <option value="0">Cualquiera</option>
                     <option value="3">⭐ 3+</option>
@@ -230,18 +230,18 @@
 
 {% block extra_js %}
 <script>
-    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    document.getElementById('pageSearchInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') performSearch();
     });
 
     let searchTimeout;
-    document.getElementById('searchInput').addEventListener('input', function() {
+    document.getElementById('pageSearchInput').addEventListener('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(performSearch, 300);
     });
 
     function performSearch() {
-        const query = document.getElementById('searchInput').value;
+        const query = document.getElementById('pageSearchInput').value;
         const genre = document.getElementById('genreFilter').value;
         const year = document.getElementById('yearFilter').value;
         const minRating = document.getElementById('ratingFilter').value;
