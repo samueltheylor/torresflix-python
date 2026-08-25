@@ -238,7 +238,7 @@
         }, 300);
         fetch('/api/select-profile', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.TORRESFLIX_CSRF || '' },
             body: JSON.stringify({ profile })
         })
         .then(response => {
