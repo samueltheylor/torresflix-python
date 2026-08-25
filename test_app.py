@@ -15,6 +15,16 @@ class TorresFlixRegressionTests(unittest.TestCase):
         with client.session_transaction() as session:
             return session["csrf_token"]
 
+    def test_demo_login_accepts_hashed_credentials(self):
+        client = app.test_client()
+        response = client.post(
+            "/login",
+            data={"username": "admin", "password": "admin123"},
+        )
+        self.assertEqual(response.status_code, 302)
+        with client.session_transaction() as session:
+            self.assertEqual(session["user"], "admin")
+
     def test_search_page_has_its_own_input_id(self):
         client = app.test_client()
         self.login(client)
