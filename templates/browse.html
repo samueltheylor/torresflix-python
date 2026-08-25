@@ -71,6 +71,7 @@
         <p class="browse-subtitle">{{ movies|length }} titulos disponibles</p>
     </div>
     
+    {% if movies %}
     <div class="browse-grid">
         {% for movie in movies %}
         <div class="browse-card" onclick="window.location.href='{{ url_for('movie_detail', movie_id=movie.id) }}'">
@@ -94,5 +95,13 @@
         </div>
         {% endfor %}
     </div>
+    {% else %}
+    <div style="text-align:center; padding:90px 20px; color:#888;">
+        <div style="font-size:64px; margin-bottom:18px;">🎬</div>
+        <h2 style="color:white; margin-bottom:10px;">Todavia no hay titulos aqui</h2>
+        <p>Estamos preparando mas contenido para esta categoria.</p>
+        <a class="btn btn-play" style="margin-top:24px;" href="{{ url_for('home') }}">Explorar tendencias</a>
+    </div>
+    {% endif %}
 </section>
 {% endblock %}
