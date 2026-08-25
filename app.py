@@ -584,20 +584,37 @@ def browse():
 @login_required
 def search():
     query = normalize(request.args.get('q', '').strip())
-    results = []
+    genre = normalize(request.args.get('genre', '').strip())
+    year = request.args.get('year', '')
+    min_rating = request.args.get('min_rating', 0, type=int)
     all_years = sorted(set(m['year'] for m in MOVIES_DB.values()), reverse=True)
     all_genres = sorted(set(g for m in MOVIES_DB.values() for g in m['genres']))
+    user_ratings = load_state()['ratings']
 
-    if query:
-        for movie in MOVIES_DB.values():
-            if (query in normalize(movie['title']) or 
-                query in normalize(' '.join(movie['genres'])) or
-                query in normalize(' '.join(movie['cast']))):
-                results.append(movie)
-    else:
-        results = sorted(MOVIES_DB.values(), key=lambda m: m['match'], reverse=True)[:12]
+    results = []
+    for movie in MOVIES_DB.values():
+        if query and not (
+            query in normalize(movie['title']) or
+            query in normalize(' '.join(movie['genres'])) or
+            query in normalize(' '.join(movie['cast'])) or
+            query in normalize(movie.get('description', ''))
+        ):
+            continue
+        if genre and not any(genre in normalize(g) for g in movie['genres']):
+            continue
+        if year and str(movie['year']) != year:
+            continue
+        if min_rating and user_ratings.get(str(movie['id']), 0) < min_rating:
+            continue
+        results.append(movie)
 
-    return render_template('search.html', query=query, results=results, all_years=all_years, all_genres=all_genres)
+    if not query and not genre and not year and not min_rating:
+        results = sorted(results, key=lambda m: m['match'], reverse=True)[:12]
+
+    return render_template(
+        'search.html', query=query, results=results,
+        all_years=all_years, all_genres=all_genres
+    )
 
 @app.route('/my-list')
 @login_required
