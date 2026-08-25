@@ -47,7 +47,7 @@ document.addEventListener('click', function(e) {
 function toggleList(movieId) {
     fetch('/api/toggle-list', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.TORRESFLIX_CSRF || '' },
         body: JSON.stringify({ movie_id: movieId })
     })
     .then(response => {
@@ -78,7 +78,7 @@ function toggleList(movieId) {
 function toggleLike(movieId) {
     fetch('/api/toggle-like', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.TORRESFLIX_CSRF || '' },
         body: JSON.stringify({ movie_id: movieId })
     })
     .then(response => {
