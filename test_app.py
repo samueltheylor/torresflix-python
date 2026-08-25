@@ -43,6 +43,32 @@ class TorresFlixRegressionTests(unittest.TestCase):
         self.assertEqual([m["id"] for m in first.get("/api/search?min_rating=5").get_json()], [1])
         self.assertEqual(second.get("/api/search?min_rating=5").get_json(), [])
 
+    def test_search_ignores_accents(self):
+        client = app.test_client()
+        self.login(client)
+        result = client.get("/api/search?q=accion").get_json()
+        self.assertTrue(any(movie["id"] == 2 for movie in result))
+
+    def test_progress_is_saved_and_removed_when_complete(self):
+        client = app.test_client()
+        self.login(client)
+        token = self.csrf(client)
+        response = client.post(
+            "/api/progress",
+            json={"movie_id": 19, "position": 30, "duration": 120, "percent": 25},
+            headers={"X-CSRF-Token": token},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(client.get("/api/progress?movie_id=19").get_json()["percent"], 25)
+
+        response = client.post(
+            "/api/progress",
+            json={"movie_id": 19, "position": 120, "duration": 120, "percent": 100},
+            headers={"X-CSRF-Token": token},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(client.get("/api/progress?movie_id=19").get_json(), {})
+
     def test_rating_must_be_in_range(self):
         client = app.test_client()
         self.login(client)
