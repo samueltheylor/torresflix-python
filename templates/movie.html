@@ -280,7 +280,7 @@
             <h2 class="video-title">Reproduciendo: {{ movie.title }}</h2>
             <button class="video-close-btn" onclick="closeVideo()">✕ Cerrar</button>
         </div>
-        <video id="videoElement" class="video-player" controls>
+        <video id="videoElement" class="video-player" controls data-resume="{{ progress.get('position', 0) }}">
             <source src="{{ movie.video }}" type="video/mp4">
             Tu navegador no soporta el reproductor de video.
         </video>
@@ -357,6 +357,10 @@
         if (videoSection && videoElement) {
             videoSection.style.display = 'block';
             videoSection.scrollIntoView({ behavior: 'smooth' });
+            const resumeAt = Number(videoElement.dataset.resume || 0);
+            if (resumeAt > 0 && videoElement.currentTime === 0) {
+                videoElement.currentTime = resumeAt;
+            }
             videoElement.play();
         }
     }
@@ -368,6 +372,38 @@
         if (videoSection) { videoSection.style.display = 'none'; }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    let progressTimer = 0;
+    function savePlaybackProgress(forceComplete = false) {
+        const videoElement = document.getElementById('videoElement');
+        if (!videoElement || !Number.isFinite(videoElement.duration) || videoElement.duration <= 0) return;
+        const percent = forceComplete ? 100 : (videoElement.currentTime / videoElement.duration) * 100;
+        fetch('/api/progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                movie_id: {{ movie.id }},
+                position: videoElement.currentTime,
+                duration: videoElement.duration,
+                percent: percent
+            })
+        }).catch(() => {});
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const videoElement = document.getElementById('videoElement');
+        if (!videoElement) return;
+        videoElement.addEventListener('timeupdate', function() {
+            const now = Date.now();
+            if (now - progressTimer > 5000) {
+                progressTimer = now;
+                savePlaybackProgress();
+            }
+        });
+        videoElement.addEventListener('ended', function() {
+            savePlaybackProgress(true);
+        });
+    });
 
     document.addEventListener('keydown', function(e) {
         const videoElement = document.getElementById('videoElement');
