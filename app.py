@@ -645,6 +645,15 @@ def search():
             continue
         results.append(movie)
 
+    if query:
+        results.sort(
+            key=lambda m: (
+                normalize(m['title']) == query,
+                normalize(m['title']).startswith(query),
+                m['match']
+            ),
+            reverse=True
+        )
     if not query and not genre and not year and not min_rating:
         results = sorted(results, key=lambda m: m['match'], reverse=True)[:12]
 
@@ -743,6 +752,15 @@ def api_search():
             'duration': movie['duration']
         })
     
+    if query:
+        results.sort(
+            key=lambda movie: (
+                normalize(movie['title']) == query,
+                normalize(movie['title']).startswith(query),
+                movie['match']
+            ),
+            reverse=True
+        )
     return jsonify(results)
 
 @app.route('/api/rate', methods=['POST'])
