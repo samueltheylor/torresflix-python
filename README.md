@@ -39,9 +39,13 @@ Open browser and go to: `http://localhost:5000`
 - User authentication
 - Movie browsing with categories
 - Search functionality
-- My List (favorites)
-- Movie details with similar content
-- Responsive design
+- My List and dedicated Me gusta page
+- SQLite persistence by account and selected profile
+- Continue watching with saved video progress
+- Accent-insensitive search with dynamic filters
+- Movie details with similar content and ratings
+- CSRF-protected state-changing APIs
+- Responsive design with mobile navigation
 - User profiles
 
 ## Project Structure
@@ -73,7 +77,13 @@ torresflix-python/
 - `GET /movie/<id>` - Movie details
 - `GET /search?q=query` - Search movies
 - `GET /my-list` - User's watchlist
-- `POST /api/toggle-list` - Add/remove from list
+- `GET /likes` - Current profile's liked titles
+- `GET /browse?type=movie|series` - Catalog type filter
+- `POST /api/toggle-list` - Add/remove from list (CSRF token required)
+- `POST /api/toggle-like` - Like/unlike a title (CSRF token required)
+- `POST /api/rate` - Save a 1–5 rating (CSRF token required)
+- `GET|POST /api/progress` - Read/save playback progress
+- `POST /api/select-profile` - Switch profile (CSRF token required)
 - `GET /api/search?q=query` - Search API
 
 ## Customization
@@ -89,3 +99,14 @@ Replace image URLs in the movie data with your own images.
 ### Adding Users
 
 Edit `USERS_DB` dictionary in `app.py` to add new users.
+
+
+## Persistence and deployment
+
+The app stores profile state in `TORRESFLIX_DB_PATH` (default: `torresflix.db`). Set `TORRESFLIX_SECRET_KEY` in production. The included database file is ignored by Git.
+
+Run the regression tests with:
+
+```bash
+python -m unittest test_app.py
+```
